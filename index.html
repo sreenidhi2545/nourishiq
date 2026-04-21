@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NourishIQ</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root {
+  --sage:    #4a7c6f;
+  --sage-lt: #e8f2ee;
+  --sage-md: #8fbfb3;
+  --amber:   #c97d2e;
+  --amber-lt:#fdf0e0;
+  --amber-md:#e9a95a;
+  --coral:   #d4614a;
+  --coral-lt:#fdecea;
+  --purple:  #6b5ea8;
+  --purple-lt:#eeecfa;
+  --cream:   #faf8f3;
+  --ink:     #1a1a18;
+  --ink-2:   #3d3d38;
+  --ink-3:   #7a7a72;
+  --ink-4:   #b0afa8;
+  --white:   #ffffff;
+  --border:  #e8e6de;
+  --card:    #ffffff;
+  --r-sm: 12px; --r-md: 18px; --r-lg: 24px; --r-xl: 32px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--cream); }
+
+/* FULL-SCREEN SHELL */
+.screen { position: fixed; inset: 0; overflow: hidden; background: var(--cream); }
+
+/* PAGES */
+.page {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  background: var(--cream);
+  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+  transform: translateX(100%); opacity: 0;
+  scrollbar-width: none;
+}
+.page::-webkit-scrollbar { display: none; }
+.page.active  { transform: translateX(0);    opacity: 1; }
+.page.prev    { transform: translateX(-30%); opacity: 0; }
+
+/* STATUS BAR */
+.status {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 24px 6px; font-size: 12px; font-weight: 500;
+  color: var(--ink-2); letter-spacing: .3px; position: sticky; top: 0; z-index: 10;
+  background: var(--cream);
+}
+.status-icons { display: flex; gap: 6px; align-items: center; }
+.status-icons span { font-size: 13px; }
+
+/* NAV BAR */
+.nav {
+  position: sticky; bottom: 0; background: var(--white);
+  display: flex; justify-content: space-around; padding: 10px 0 20px;
+  border-top: 1px solid var(--border); z-index: 10;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 500; color: var(--ink-4);
+  cursor: pointer; padding: 4px 16px; border-radius: 12px;
+  transition: all .2s; letter-spacing: .3px;
+}
+.nav-item.active { color: var(--sage); }
+.nav-icon { font-size: 20px; line-height: 1; }
+
+/* TYPOGRAPHY */
+.serif { font-family: 'DM Serif Display', serif; }
+.syne  { font-family: 'Syne', sans-serif; }
+
+/* BUTTONS */
+.btn-primary {
+  background: var(--sage); color: #fff; border: none; border-radius: var(--r-md);
+  padding: 16px 28px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; width: 100%; letter-spacing: .3px;
+  transition: background .2s, transform .1s;
+}
+.btn-primary:active { transform: scale(.98); background: #3d6b5e; }
+
+.btn-outline {
+  background: transparent; color: var(--sage); border: 1.5px solid var(--sage);
+  border-radius: var(--r-md); padding: 14px 28px;
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; width: 100%; letter-spacing: .3px; transition: all .2s;
+}
+.btn-outline:active { background: var(--sage-lt); }
+
+/* CARDS */
+.card {
+  background: var(--white); border-radius: var(--r-lg);
+  border: 1px solid var(--border); padding: 20px;
+}
+
+/* ===================== SCREEN 1: ONBOARDING ===================== */
+#s-onboard { background: var(--cream); }
+.onboard-hero {
+  height: 320px; background: var(--sage);
+  border-radius: 0 0 48px 48px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; position: relative; overflow: hidden;
+}
+.onboard-rings {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+}
+.onboard-rings .ring {
+  position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.12);
+}
+.logo-mark {
+  width: 80px; height: 80px; background: rgba(255,255,255,.15);
+  border-radius: 24px; display: flex; align-items: center; justify-content: center;
+  font-size: 36px; position: relative; z-index: 1;
+}
+.onboard-tagline {
+  color: rgba(255,255,255,.9); font-family: 'DM Serif Display', serif;
+  font-size: 22px; text-align: center; margin-top: 16px; position: relative; z-index: 1;
+  line-height: 1.3; padding: 0 32px;
+}
+.onboard-body { padding: 32px 24px 24px; }
+.onboard-body h1 {
+  font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink);
+  line-height: 1.25; margin-bottom: 10px;
+}
+.onboard-body p { font-size: 14px; color: var(--ink-3); line-height: 1.7; margin-bottom: 28px; }
+.feature-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+.pill {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 100px; padding: 6px 14px; font-size: 12px;
+  font-weight: 500; color: var(--ink-2); font-family: 'Syne', sans-serif;
+}
+.pill.green { background: var(--sage-lt); border-color: var(--sage-md); color: var(--sage); }
+.pill.amber { background: var(--amber-lt); border-color: var(--amber-md); color: var(--amber); }
+.pill.coral { background: var(--coral-lt); border-color: #e8a89a; color: var(--coral); }
+
+/* ===================== SCREEN 2: SYMPTOM ===================== */
+#s-symptom { background: var(--cream); }
+.symptom-header { padding: 16px 24px 20px; }
+.symptom-header h2 {
+  font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--ink);
+  line-height: 1.3; margin-bottom: 6px;
+}
+.symptom-header p { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+.symptom-grid { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.symptom-card {
+  background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r-md);
+  padding: 16px; cursor: pointer; transition: all .2s; text-align: center;
+}
+.symptom-card:active, .symptom-card.selected {
+  border-color: var(--sage); background: var(--sage-lt);
+}
+.symptom-icon { font-size: 28px; margin-bottom: 8px; }
+.symptom-name { font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Syne', sans-serif; margin-bottom: 3px; }
+.symptom-hint { font-size: 11px; color: var(--ink-4); }
+.or-divider {
+  display: flex; align-items: center; gap: 12px; padding: 20px 24px;
+  font-size: 12px; color: var(--ink-4); font-family: 'Syne', sans-serif; font-weight: 600;
+}
+.or-divider::before, .or-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.upload-box {
+  margin: 0 20px; background: var(--white); border: 1.5px dashed var(--border);
+  border-radius: var(--r-md); padding: 24px; text-align: center; cursor: pointer;
+  transition: border-color .2s;
+}
+.upload-box:active { border-color: var(--sage); }
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+.upload-box h3 { font-size: 14px; font-weight: 600; color: var(--ink); font-family: 'Syne', sans-serif; margin-bottom: 4px; }
+.upload-box p { font-size: 12px; color: var(--ink-4); }
+.symptom-cta { padding: 20px 20px 8px; }
+
+/* ===================== SCREEN 3: DASHBOARD ===================== */
+#s-dashboard { background: var(--cream); }
+.dash-header {
+  padding: 8px 24px 20px; display: flex; justify-content: space-between; align-items: center;
+}
+.dash-greeting { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
+.dash-greeting span { color: var(--sage); }
+.dash-avatar {
+  width: 42px; height: 42px; border-radius: 14px; background: var(--sage);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer;
+}
+
+/* BODY SCORE CARD */
+.score-card {
+  margin: 0 20px 16px; background: var(--sage);
+  border-radius: var(--r-xl); padding: 24px; position: relative; overflow: hidden;
+}
+.score-bg-circle {
+  position: absolute; right: -30px; top: -30px; width: 160px; height: 160px;
+  border-radius: 50%; background: rgba(255,255,255,.08);
+}
+.score-bg-circle2 {
+  position: absolute; right: 20px; top: 60px; width: 80px; height: 80px;
+  border-radius: 50%; background: rgba(255,255,255,.06);
+}
+.score-label { font-size: 11px; color: rgba(255,255,255,.7); font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.score-number { font-family: 'DM Serif Display', serif; font-size: 64px; color: #fff; line-height: 1; }
+.score-number span { font-size: 22px; opacity: .7; }
+.score-subtitle { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 6px; }
+.score-row { display: flex; gap: 12px; margin-top: 18px; }
+.score-badge {
+  background: rgba(255,255,255,.15); border-radius: 10px; padding: 8px 14px;
+  font-size: 12px; color: #fff; font-family: 'Syne', sans-serif; font-weight: 500;
+}
+
+/* NUTRIENT RINGS */
+.rings-section { padding: 0 20px 16px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: .5px; text-transform: uppercase; }
+.section-link { font-size: 12px; color: var(--sage); font-weight: 600; cursor: pointer; }
+.rings-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.rings-row::-webkit-scrollbar { display: none; }
+.ring-card {
+  background: var(--white); border-radius: var(--r-md); border: 1px solid var(--border);
+  padding: 16px 14px; text-align: center; min-width: 90px; flex-shrink: 0;
+}
+.ring-svg { width: 60px; height: 60px; }
+.ring-name { font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 600; color: var(--ink-2); margin-top: 8px; }
+.ring-pct  { font-size: 10px; color: var(--ink-4); margin-top: 2px; }
+
+/* STREAK */
+.streak-card {
+  margin: 0 20px 16px; background: var(--amber-lt);
+  border: 1px solid var(--amber-md); border-radius: var(--r-lg); padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.streak-flame { font-size: 36px; }
+.streak-text h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--amber); }
+.streak-text p  { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.streak-days { margin-left: auto; text-align: center; }
+.streak-days .num { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--amber); line-height: 1; }
+.streak-days .lbl { font-size: 10px; color: var(--ink-4); font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: .5px; }
+
+/* DAILY TIP */
+.tip-card {
+  margin: 0 20px 20px; background: var(--white);
+  border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden;
+}
+.tip-tag {
+  background: var(--purple-lt); padding: 8px 16px;
+  font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700;
+  color: var(--purple); letter-spacing: 1px; text-transform: uppercase;
+}
+.tip-body { padding: 14px 16px 16px; }
+.tip-body h3 { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--ink); margin-bottom: 6px; }
+.tip-body p  { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+
+/* ===================== SCREEN 4: FOOD RECS ===================== */
+#s-food { background: var(--cream); }
+.food-header { padding: 8px 24px 12px; }
+.food-header h2 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
+.food-header p  { font-size: 13px; color: var(--ink-3); }
+.deficiency-banner {
+  margin: 0 20px 16px; padding: 14px 18px; background: var(--coral-lt);
+  border: 1px solid #e8a89a; border-radius: var(--r-md);
+  display: flex; align-items: center; gap: 12px;
+}
+.def-icon { font-size: 24px; }
+.def-text h4 { font-size: 13px; font-weight: 600; color: var(--coral); font-family: 'Syne', sans-serif; }
+.def-text p  { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.food-filters { display: flex; gap: 8px; padding: 0 20px 16px; overflow-x: auto; scrollbar-width: none; }
+.food-filters::-webkit-scrollbar { display: none; }
+.filter-chip {
+  background: var(--white); border: 1px solid var(--border); border-radius: 100px;
+  padding: 7px 16px; font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 600;
+  color: var(--ink-3); white-space: nowrap; cursor: pointer; transition: all .2s; flex-shrink: 0;
+}
+.filter-chip.active { background: var(--sage); color: #fff; border-color: var(--sage); }
+.food-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+.food-card {
+  background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border);
+  padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: border-color .2s;
+}
+.food-card:active { border-color: var(--sage); }
+.food-emoji { font-size: 36px; width: 56px; height: 56px; background: var(--cream); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.food-info { flex: 1; }
+.food-info h3 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.food-info p  { font-size: 12px; color: var(--ink-3); line-height: 1.4; }
+.food-nutrients { display: flex; gap: 6px; margin-top: 6px; }
+.nutrient-tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 100px; font-family: 'Syne', sans-serif; font-weight: 600;
+}
+.nt-iron   { background: var(--coral-lt);   color: var(--coral); }
+.nt-b12    { background: var(--purple-lt);  color: var(--purple); }
+.nt-vitd   { background: var(--amber-lt);   color: var(--amber); }
+.nt-folate { background: var(--sage-lt);    color: var(--sage); }
+.food-add {
+  background: var(--sage); color: #fff; border: none; border-radius: 12px;
+  width: 36px; height: 36px; font-size: 20px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: background .2s;
+}
+.food-add:active { background: #3d6b5e; }
+
+/* ===================== SCREEN 5: CART ===================== */
+#s-cart { background: var(--cream); }
+.cart-header { padding: 8px 24px 16px; }
+.cart-header h2 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
+.cart-header p  { font-size: 13px; color: var(--ink-3); }
+.store-badge {
+  margin: 0 20px 16px; background: var(--white); border-radius: var(--r-md);
+  border: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+}
+.store-logo {
+  background: #e63946; color: #fff; border-radius: 10px; padding: 6px 12px;
+  font-size: 12px; font-weight: 700; font-family: 'Syne', sans-serif;
+}
+.store-info h4 { font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Syne', sans-serif; }
+.store-info p  { font-size: 11px; color: var(--sage); margin-top: 1px; }
+.cart-items { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.cart-item {
+  background: var(--white); border-radius: var(--r-md); border: 1px solid var(--border);
+  padding: 14px; display: flex; align-items: center; gap: 12px;
+}
+.cart-item-emoji { font-size: 28px; width: 46px; height: 46px; background: var(--cream); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cart-item-info { flex: 1; }
+.cart-item-info h4 { font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Syne', sans-serif; }
+.cart-item-info p  { font-size: 11px; color: var(--ink-4); margin-top: 2px; }
+.cart-item-for { font-size: 10px; color: var(--sage); font-family: 'Syne', sans-serif; font-weight: 600; margin-top: 3px; }
+.qty-ctrl { display: flex; align-items: center; gap: 10px; }
+.qty-btn {
+  width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--cream); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-2);
+}
+.qty-num { font-size: 14px; font-weight: 600; color: var(--ink); min-width: 16px; text-align: center; font-family: 'Syne', sans-serif; }
+.cart-price { font-size: 14px; font-weight: 700; color: var(--ink); font-family: 'Syne', sans-serif; margin-left: 8px; }
+.cart-summary {
+  margin: 16px 20px; background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 18px;
+}
+.summary-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3); padding: 4px 0; }
+.summary-row.total { font-weight: 700; color: var(--ink); font-family: 'Syne', sans-serif; font-size: 15px; border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+.cart-cta { padding: 8px 20px 8px; }
+.delivery-note { text-align: center; font-size: 11px; color: var(--sage); margin-top: 8px; font-family: 'Syne', sans-serif; }
+
+/* ===================== SCREEN 6: AWARENESS ===================== */
+#s-awareness { background: var(--cream); }
+.aware-header { padding: 8px 24px 16px; }
+.aware-header h2 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
+.aware-header p  { font-size: 13px; color: var(--ink-3); }
+.featured-card {
+  margin: 0 20px 20px; border-radius: var(--r-xl); overflow: hidden;
+  background: var(--purple); position: relative; padding: 28px 24px;
+}
+.featured-bg {
+  position: absolute; right: -20px; bottom: -20px; width: 140px; height: 140px;
+  border-radius: 50%; background: rgba(255,255,255,.08);
+}
+.featured-tag {
+  display: inline-block; background: rgba(255,255,255,.2); color: #fff;
+  font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 5px 12px; border-radius: 100px; margin-bottom: 14px;
+}
+.featured-card h2 { font-family: 'DM Serif Display', serif; font-size: 21px; color: #fff; line-height: 1.3; margin-bottom: 10px; }
+.featured-card p  { font-size: 13px; color: rgba(255,255,255,.8); line-height: 1.6; }
+.aware-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+.aware-card {
+  background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 18px; cursor: pointer;
+}
+.aware-card-top { display: flex; align-items: flex-start; gap: 14px; }
+.aware-emoji { font-size: 28px; width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.aware-emoji.green  { background: var(--sage-lt); }
+.aware-emoji.amber  { background: var(--amber-lt); }
+.aware-emoji.coral  { background: var(--coral-lt); }
+.aware-meta { flex: 1; }
+.aware-category { font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 4px; }
+.cat-absorption { color: var(--sage); }
+.cat-timing     { color: var(--amber); }
+.cat-combo      { color: var(--coral); }
+.aware-meta h3  { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--ink); line-height: 1.3; }
+.aware-meta p   { font-size: 12px; color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
+.aware-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.aware-action span { font-size: 12px; color: var(--sage); font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer; }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page.active .card, .page.active .score-card,
+.page.active .ring-card, .page.active .streak-card,
+.page.active .tip-card, .page.active .food-card,
+.page.active .cart-item, .page.active .aware-card {
+  animation: fadeUp .4s ease both;
+}
+.page.active .ring-card:nth-child(1) { animation-delay: .05s; }
+.page.active .ring-card:nth-child(2) { animation-delay: .10s; }
+.page.active .ring-card:nth-child(3) { animation-delay: .15s; }
+.page.active .ring-card:nth-child(4) { animation-delay: .20s; }
+.page.active .ring-card:nth-child(5) { animation-delay: .25s; }
+.page.active .food-card:nth-child(1), .page.active .cart-item:nth-child(1), .page.active .aware-card:nth-child(1) { animation-delay: .05s; }
+.page.active .food-card:nth-child(2), .page.active .cart-item:nth-child(2), .page.active .aware-card:nth-child(2) { animation-delay: .10s; }
+.page.active .food-card:nth-child(3), .page.active .cart-item:nth-child(3), .page.active .aware-card:nth-child(3) { animation-delay: .15s; }
+.page.active .food-card:nth-child(4), .page.active .cart-item:nth-child(4) { animation-delay: .20s; }
+
+/* RING SVG CIRCLES */
+.ring-track { fill: none; stroke: var(--border); stroke-width: 5; }
+.ring-fill  { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+
+/* ===================== LOADING OVERLAY ===================== */
+.loading-overlay {
+  position: absolute; inset: 0; z-index: 100;
+  background: rgba(250,248,243,.92); backdrop-filter: blur(6px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.loading-overlay.active { opacity: 1; pointer-events: all; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-spinner {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--sage);
+  animation: spin 0.9s linear infinite;
+}
+.loading-label {
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+  color: var(--ink-3); letter-spacing: .3px; text-align: center; padding: 0 32px;
+}
+.loading-steps { display: flex; flex-direction: column; gap: 8px; }
+.loading-step {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--ink-4); font-family: 'Syne', sans-serif;
+}
+.loading-step .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0;
+  transition: background .3s;
+}
+.loading-step.done .dot  { background: var(--sage); }
+.loading-step.active .dot { background: var(--amber); animation: pulse-dot 1s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* confidence badge used inside score-badge */
+.conf-badge {
+  display: inline-block; font-size: 10px; opacity: .75;
+  font-family: 'Syne', sans-serif; margin-left: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+<!-- ===================== ONBOARDING ===================== -->
+<div class="page active" id="s-onboard">
+  <div class="status">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="onboard-hero">
+    <div class="onboard-rings">
+      <div class="ring" style="width:280px;height:280px;"></div>
+      <div class="ring" style="width:200px;height:200px;"></div>
+      <div class="ring" style="width:130px;height:130px;"></div>
+    </div>
+    <div class="logo-mark">🌿</div>
+    <div class="onboard-tagline">Your body knows<br><em>what it needs</em></div>
+  </div>
+  <div class="onboard-body">
+    <h1>Eat smarter.<br>Feel better.</h1>
+    <p>Tell us how you feel or upload your blood report — NourishIQ finds your nutritional gaps and puts the right food at your doorstep.</p>
+    <div class="feature-pills">
+      <div class="pill green">AI deficiency detection</div>
+      <div class="pill amber">Local Indian foods</div>
+      <div class="pill coral">DMart delivery</div>
+      <div class="pill">Blood report reader</div>
+      <div class="pill">Habit streaks</div>
+    </div>
+    <button class="btn-primary" onclick="goTo('s-symptom')">Get started →</button>
+    <div style="height:12px;"></div>
+    <button class="btn-outline" onclick="goTo('s-dashboard')">Skip to dashboard</button>
+  </div>
+</div>
+
+<!-- ===================== SYMPTOM CHECKER ===================== -->
+<div class="page" id="s-symptom">
+  <div class="status">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="symptom-header">
+    <div style="font-size:12px;color:var(--sage);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px;">STEP 1 OF 1</div>
+    <h2>How are you feeling lately?</h2>
+    <p>Select all that apply — our AI will map these to nutritional gaps in your body.</p>
+  </div>
+  <div class="symptom-grid">
+    <div class="symptom-card" onclick="this.classList.toggle('selected')">
+      <div class="symptom-icon">😴</div>
+      <div class="symptom-name">Always tired</div>
+      <div class="symptom-hint">Low energy, fatigue</div>
+    </div>
+    <div class="symptom-card" onclick="this.classList.toggle('selected')">
+      <div class="symptom-icon">💇</div>
+      <div class="symptom-name">Hair fall</div>
+      <div class="symptom-hint">Thinning, brittle</div>
+    </div>
+    <div class="symptom-card" onclick="this.classList.toggle('selected')">
+      <div class="symptom-icon">🦴</div>
+      <div class="symptom-name">Weak bones</div>
+      <div class="symptom-hint">Aches, cramps</div>
+    </div>
+    <div class="symptom-card" onclick="this.classList.toggle('selected')">
+      <div class="symptom-icon">🧠</div>
+      <div class="symptom-name">Brain fog</div>
+      <div class="symptom-hint">Trouble focusing</div>
+    </div>
+    <div class="symptom-card" onclick="this.classList.toggle('selected')">
+      <div class="symptom-icon">😶</div>
+      <div class="symptom-name">Pale skin</div>
+      <div class="symptom-hint">Dull complexion</div>
+    </div>
+    <div class="symptom-card" onclick="this.classList.toggle('selected')">
+      <div class="symptom-icon">🫀</div>
+      <div class="symptom-name">Palpitations</div>
+      <div class="symptom-hint">Racing heartbeat</div>
+    </div>
+  </div>
+
+  <div class="or-divider">OR UPLOAD REPORT</div>
+
+  <div class="upload-box" id="upload-box" onclick="document.getElementById('blood-file-input').click()">
+    <div class="upload-icon" id="upload-icon">📄</div>
+    <h3 id="upload-title">Upload blood test report</h3>
+    <p id="upload-hint">PDF or image · AI reads values automatically</p>
+  </div>
+  <input type="file" id="blood-file-input" accept=".pdf,image/*" style="display:none"
+         onchange="uploadBloodReport(this)">
+
+  <div class="symptom-cta">
+    <button class="btn-primary" id="analyse-btn" onclick="analyseSymptoms()" style="margin-top:8px;">Analyse my body →</button>
+  </div>
+  <div style="height:16px;"></div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="page" id="s-dashboard">
+  <div class="status">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="dash-header">
+    <div>
+      <div style="font-size:12px;color:var(--ink-4);font-family:'Syne',sans-serif;margin-bottom:2px;">Good afternoon,</div>
+      <div class="dash-greeting">Priya <span>✦</span></div>
+    </div>
+    <div class="dash-avatar">🌿</div>
+  </div>
+
+  <!-- BODY SCORE -->
+  <div class="score-card">
+    <div class="score-bg-circle"></div>
+    <div class="score-bg-circle2"></div>
+    <div class="score-label">BODY SCORE</div>
+    <div class="score-number">72<span>/100</span></div>
+    <div class="score-subtitle">You're doing well — 3 nutrients need attention</div>
+    <div class="score-row">
+      <div class="score-badge">🔴 Low Iron</div>
+      <div class="score-badge">🟡 Low Vit D</div>
+      <div class="score-badge">🔴 Low B12</div>
+    </div>
+  </div>
+
+  <!-- NUTRIENT RINGS -->
+  <div class="rings-section">
+    <div class="section-header">
+      <div class="section-title">Nutrient levels</div>
+      <div class="section-link" onclick="goTo('s-food')">View all →</div>
+    </div>
+    <div class="rings-row">
+      <!-- Iron -->
+      <div class="ring-card">
+        <svg class="ring-svg" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="22"/>
+          <circle class="ring-fill" cx="30" cy="30" r="22" stroke="#d4614a"
+            stroke-dasharray="138.2" stroke-dashoffset="96.7"
+            transform="rotate(-90 30 30)" id="ring-iron"/>
+        </svg>
+        <div class="ring-name">Iron</div>
+        <div class="ring-pct">30%</div>
+      </div>
+      <!-- Vitamin D -->
+      <div class="ring-card">
+        <svg class="ring-svg" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="22"/>
+          <circle class="ring-fill" cx="30" cy="30" r="22" stroke="#c97d2e"
+            stroke-dasharray="138.2" stroke-dashoffset="55.3"
+            transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="ring-name">Vit D</div>
+        <div class="ring-pct">60%</div>
+      </div>
+      <!-- B12 -->
+      <div class="ring-card">
+        <svg class="ring-svg" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="22"/>
+          <circle class="ring-fill" cx="30" cy="30" r="22" stroke="#6b5ea8"
+            stroke-dasharray="138.2" stroke-dashoffset="110.6"
+            transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="ring-name">B12</div>
+        <div class="ring-pct">20%</div>
+      </div>
+      <!-- Calcium -->
+      <div class="ring-card">
+        <svg class="ring-svg" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="22"/>
+          <circle class="ring-fill" cx="30" cy="30" r="22" stroke="#4a7c6f"
+            stroke-dasharray="138.2" stroke-dashoffset="27.6"
+            transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="ring-name">Calcium</div>
+        <div class="ring-pct">80%</div>
+      </div>
+      <!-- Folate -->
+      <div class="ring-card">
+        <svg class="ring-svg" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="22"/>
+          <circle class="ring-fill" cx="30" cy="30" r="22" stroke="#8fbfb3"
+            stroke-dasharray="138.2" stroke-dashoffset="48.4"
+            transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="ring-name">Folate</div>
+        <div class="ring-pct">65%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STREAK -->
+  <div class="streak-card">
+    <div class="streak-flame">🔥</div>
+    <div class="streak-text">
+      <h3>7-day streak!</h3>
+      <p>Keep eating well to maintain your progress</p>
+    </div>
+    <div class="streak-days">
+      <div class="num">7</div>
+      <div class="lbl">DAYS</div>
+    </div>
+  </div>
+
+  <!-- TODAY'S TIP -->
+  <div class="tip-card">
+    <div class="tip-tag">💡 TODAY'S SCIENCE</div>
+    <div class="tip-body">
+      <h3>Eat spinach with lemon for 3× more iron absorption</h3>
+      <p>Vitamin C in lemon converts non-heme iron (found in plant foods) into a form your body absorbs 3x more efficiently.</p>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-item" onclick="goTo('s-dashboard')">
+      <div class="nav-icon">🏠</div><div>Home</div>
+    </div>
+    <div class="nav-item" onclick="goTo('s-food')">
+      <div class="nav-icon">🥗</div><div>Foods</div>
+    </div>
+    <div class="nav-item" onclick="goTo('s-cart')">
+      <div class="nav-icon">🛒</div><div>Cart</div>
+    </div>
+    <div class="nav-item" onclick="goTo('s-awareness')">
+      <div class="nav-icon">💡</div><div>Learn</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FOOD RECOMMENDATIONS ===================== -->
+<div class="page" id="s-food">
+  <div class="status">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="food-header">
+    <h2>Foods for you</h2>
+    <p>Based on your iron & B12 deficiency</p>
+  </div>
+
+  <div class="deficiency-banner">
+    <div class="def-icon">⚠️</div>
+    <div class="def-text">
+      <h4>Iron deficiency detected</h4>
+      <p>Your level is 30% — these foods will help</p>
+    </div>
+  </div>
+
+  <div class="food-filters">
+    <div class="filter-chip active">All foods</div>
+    <div class="filter-chip">Vegetarian</div>
+    <div class="filter-chip">Vegan</div>
+    <div class="filter-chip">Budget-friendly</div>
+    <div class="filter-chip">Quick meals</div>
+  </div>
+
+  <div class="food-list">
+    <div class="food-card" onclick="addToCart(this,'Palak (Spinach)','₹25')">
+      <div class="food-emoji">🥬</div>
+      <div class="food-info">
+        <h3>Palak (Spinach)</h3>
+        <p>High non-heme iron · Pairs well with lemon</p>
+        <div class="food-nutrients">
+          <span class="nutrient-tag nt-iron">Iron 2.7mg</span>
+          <span class="nutrient-tag nt-folate">Folate</span>
+        </div>
+      </div>
+      <button class="food-add">+</button>
+    </div>
+    <div class="food-card" onclick="addToCart(this,'Masoor Dal','₹60')">
+      <div class="food-emoji">🫘</div>
+      <div class="food-info">
+        <h3>Masoor Dal</h3>
+        <p>Iron-rich lentil · Budget-friendly daily staple</p>
+        <div class="food-nutrients">
+          <span class="nutrient-tag nt-iron">Iron 3.3mg</span>
+          <span class="nutrient-tag nt-folate">Folate</span>
+        </div>
+      </div>
+      <button class="food-add">+</button>
+    </div>
+    <div class="food-card" onclick="addToCart(this,'Dates (Khajoor)','₹80')">
+      <div class="food-emoji">🌴</div>
+      <div class="food-info">
+        <h3>Dates (Khajoor)</h3>
+        <p>Natural iron + instant energy boost</p>
+        <div class="food-nutrients">
+          <span class="nutrient-tag nt-iron">Iron 0.9mg</span>
+        </div>
+      </div>
+      <button class="food-add">+</button>
+    </div>
+    <div class="food-card" onclick="addToCart(this,'Eggs','₹72')">
+      <div class="food-emoji">🥚</div>
+      <div class="food-info">
+        <h3>Eggs</h3>
+        <p>Best natural B12 source · Easy daily habit</p>
+        <div class="food-nutrients">
+          <span class="nutrient-tag nt-b12">B12 0.6µg</span>
+          <span class="nutrient-tag nt-vitd">Vit D</span>
+        </div>
+      </div>
+      <button class="food-add">+</button>
+    </div>
+    <div class="food-card" onclick="addToCart(this,'Rajma (Kidney Beans)','₹55')">
+      <div class="food-emoji">🫘</div>
+      <div class="food-info">
+        <h3>Rajma (Kidney Beans)</h3>
+        <p>Iron powerhouse · Classic North Indian food</p>
+        <div class="food-nutrients">
+          <span class="nutrient-tag nt-iron">Iron 5.2mg</span>
+          <span class="nutrient-tag nt-folate">Folate</span>
+        </div>
+      </div>
+      <button class="food-add">+</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-item" onclick="goTo('s-dashboard')"><div class="nav-icon">🏠</div><div>Home</div></div>
+    <div class="nav-item active" onclick="goTo('s-food')"><div class="nav-icon">🥗</div><div>Foods</div></div>
+    <div class="nav-item" onclick="goTo('s-cart')"><div class="nav-icon">🛒</div><div>Cart</div></div>
+    <div class="nav-item" onclick="goTo('s-awareness')"><div class="nav-icon">💡</div><div>Learn</div></div>
+  </div>
+</div>
+
+<!-- ===================== SMART CART ===================== -->
+<div class="page" id="s-cart">
+  <div class="status">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="cart-header">
+    <h2>Your health cart</h2>
+    <p>Items chosen to fix your deficiencies</p>
+  </div>
+
+  <div class="store-badge">
+    <div class="store-logo">D-Mart</div>
+    <div class="store-info">
+      <h4>D-Mart, Hyderabad</h4>
+      <p>⚡ Delivery in 45 mins · Free above ₹499</p>
+    </div>
+  </div>
+
+  <div class="cart-items" id="cart-items">
+    <div class="cart-item">
+      <div class="cart-item-emoji">🥬</div>
+      <div class="cart-item-info">
+        <h4>Palak (Spinach)</h4>
+        <p>250g bundle · Fresh</p>
+        <div class="cart-item-for">For: Iron deficiency</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
+      </div>
+      <div class="cart-price">₹25</div>
+    </div>
+    <div class="cart-item">
+      <div class="cart-item-emoji">🫘</div>
+      <div class="cart-item-info">
+        <h4>Masoor Dal</h4>
+        <p>500g pack · Tata Sampann</p>
+        <div class="cart-item-for">For: Iron deficiency</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
+      </div>
+      <div class="cart-price">₹60</div>
+    </div>
+    <div class="cart-item">
+      <div class="cart-item-emoji">🥚</div>
+      <div class="cart-item-info">
+        <h4>Eggs (Farm Fresh)</h4>
+        <p>6-pack · Nandini</p>
+        <div class="cart-item-for">For: B12 deficiency</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
+      </div>
+      <div class="cart-price">₹72</div>
+    </div>
+  </div>
+
+  <div class="cart-summary">
+    <div class="summary-row"><span>Subtotal</span><span>₹157</span></div>
+    <div class="summary-row"><span>Delivery fee</span><span style="color:var(--sage)">Free</span></div>
+    <div class="summary-row"><span>Health score of cart</span><span style="color:var(--sage);font-weight:700;">+22 pts 🌿</span></div>
+    <div class="summary-row total"><span>Total</span><span>₹157</span></div>
+  </div>
+
+  <div class="cart-cta">
+    <button class="btn-primary" onclick="alert('Order placed! Estimated delivery: 45 minutes. Your body will thank you 🌿')">Place order — ₹157</button>
+    <div class="delivery-note">🌿 This cart addresses 3 of your deficiencies</div>
+  </div>
+  <div style="height:8px;"></div>
+
+  <div class="nav">
+    <div class="nav-item" onclick="goTo('s-dashboard')"><div class="nav-icon">🏠</div><div>Home</div></div>
+    <div class="nav-item" onclick="goTo('s-food')"><div class="nav-icon">🥗</div><div>Foods</div></div>
+    <div class="nav-item active" onclick="goTo('s-cart')"><div class="nav-icon">🛒</div><div>Cart</div></div>
+    <div class="nav-item" onclick="goTo('s-awareness')"><div class="nav-icon">💡</div><div>Learn</div></div>
+  </div>
+</div>
+
+<!-- ===================== AWARENESS FEED ===================== -->
+<div class="page" id="s-awareness">
+  <div class="status">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="aware-header">
+    <h2>Daily science</h2>
+    <p>Bite-sized nutrition facts, personalized for you</p>
+  </div>
+
+  <div class="featured-card">
+    <div class="featured-bg"></div>
+    <div class="featured-tag">TODAY'S HIGHLIGHT</div>
+    <h2>Why your body absorbs iron better at night</h2>
+    <p>Your gut absorbs non-heme iron most efficiently in a fasted state — eating iron-rich foods as dinner (not breakfast) can increase absorption by up to 40%.</p>
+  </div>
+
+  <div class="aware-list">
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji green">🍋</div>
+        <div class="aware-meta">
+          <div class="aware-category cat-absorption">Absorption tip</div>
+          <h3>Lemon juice triples your iron uptake</h3>
+          <p>Just squeezing lemon on spinach or dal converts iron to a form 3× more absorbable by your body.</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span onclick="goTo('s-food')">Try it → View iron foods</span>
+        <span style="color:var(--ink-4);font-size:11px;">2 min read</span>
+      </div>
+    </div>
+
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji amber">☀️</div>
+        <div class="aware-meta">
+          <div class="aware-category cat-timing">Timing</div>
+          <h3>10 mins of morning sun = your daily Vitamin D</h3>
+          <p>UVB rays before 10 AM trigger skin synthesis of Vitamin D without the UV damage risk of midday sun.</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span>Add to routine</span>
+        <span style="color:var(--ink-4);font-size:11px;">1 min read</span>
+      </div>
+    </div>
+
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji coral">🥛</div>
+        <div class="aware-meta">
+          <div class="aware-category cat-combo">Food combo</div>
+          <h3>Don't take iron and milk together</h3>
+          <p>Calcium in dairy actively blocks iron absorption. Leave a 2-hour gap between iron-rich foods and dairy.</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span onclick="goTo('s-food')">See safe combos</span>
+        <span style="color:var(--ink-4);font-size:11px;">2 min read</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-item" onclick="goTo('s-dashboard')"><div class="nav-icon">🏠</div><div>Home</div></div>
+    <div class="nav-item" onclick="goTo('s-food')"><div class="nav-icon">🥗</div><div>Foods</div></div>
+    <div class="nav-item" onclick="goTo('s-cart')"><div class="nav-icon">🛒</div><div>Cart</div></div>
+    <div class="nav-item active" onclick="goTo('s-awareness')"><div class="nav-icon">💡</div><div>Learn</div></div>
+  </div>
+</div>
+
+<!-- ===================== LOADING OVERLAY ===================== -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-label">NourishIQ AI is analysing<br>your symptoms…</div>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls-1"><div class="dot"></div> Reading symptoms</div>
+    <div class="loading-step" id="ls-2"><div class="dot"></div> Detecting deficiencies</div>
+    <div class="loading-step" id="ls-3"><div class="dot"></div> Finding Hyderabad foods</div>
+    <div class="loading-step" id="ls-4"><div class="dot"></div> Building your dashboard</div>
+  </div>
+</div>
+
+
+
+</div><!-- /screen -->
+
+<script>
+// ─── Navigation ───────────────────────────────────────────────────────────────
+let current = 's-onboard';
+
+function goTo(id) {
+  const prev = document.getElementById(current);
+  const next = document.getElementById(id);
+  if (!next || id === current) return;
+  prev.classList.remove('active');
+  prev.classList.add('prev');
+  next.classList.remove('prev');
+  next.classList.add('active');
+  setTimeout(() => prev.classList.remove('prev'), 400);
+  current = id;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  next.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(id)) n.classList.add('active');
+  });
+  next.scrollTop = 0;
+}
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let cart = [];
+let allFoodsData = [];
+
+function shakeElement(el) {
+  if (!el) return;
+  el.animate([
+    { transform: 'translateX(0)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(5px)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(5px)' },
+    { transform: 'translateX(0)' }
+  ], { duration: 300, easing: 'ease-in-out' });
+}
+
+function showInlineError(msg, contextId) {
+  let errEl = document.getElementById('inline-err-' + contextId);
+  if (!errEl) {
+    errEl = document.createElement('div');
+    errEl.id = 'inline-err-' + contextId;
+    errEl.style.color = 'var(--coral)';
+    errEl.style.fontSize = '13px';
+    errEl.style.fontWeight = '500';
+    errEl.style.marginTop = '8px';
+    errEl.style.textAlign = 'center';
+    let parent = contextId === 'symptom-cta' ? document.querySelector('.symptom-cta') :
+                 contextId === 'upload-box' ? document.getElementById('upload-box').parentElement : null;
+    if (parent) parent.appendChild(errEl);
+  }
+  if (errEl) errEl.textContent = msg;
+}
+
+function clearInlineError(contextId) {
+  const errEl = document.getElementById('inline-err-' + contextId);
+  if (errEl) errEl.textContent = '';
+}
+
+function addToCart(el, name, price, forDeficiency, emoji) {
+  const btn = el.querySelector('.food-add');
+  btn.textContent = '✓';
+  btn.style.background = '#3d6b5e';
+  setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; }, 1200);
+
+  const existing = cart.find(i => i.name === name);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    let p = typeof price === 'number' ? price : parseInt((price||'').replace('₹','')) || (Math.floor(Math.random()*40)*5+20);
+    cart.push({ name, price: p, qty: 1, forDeficiency: forDeficiency || 'Wellness', emoji: emoji || '🍱' });
+  }
+  renderCart();
+}
+
+function changeQty(name, delta) {
+  const item = cart.find(i => i.name === name);
+  if (item) {
+    item.qty += delta;
+    if (item.qty < 1) cart = cart.filter(i => i.name !== name);
+  }
+  renderCart();
+}
+
+function renderCart() {
+  const cartItemsEl = document.getElementById('cart-items');
+  if (!cartItemsEl) return;
+  cartItemsEl.innerHTML = '';
+  let subtotal = 0;
+  cart.forEach(item => {
+    subtotal += item.price * item.qty;
+    cartItemsEl.innerHTML += `
+      <div class="cart-item">
+        <div class="cart-item-emoji">${item.emoji}</div>
+        <div class="cart-item-info">
+          <h4>${item.name}</h4>
+          <p>Fresh Produce</p>
+          <div class="cart-item-for">For: ${item.forDeficiency}</div>
+        </div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeQty('${item.name.replace(/'/g,"\\'")}', -1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.name.replace(/'/g,"\\'")}', 1)">+</button>
+        </div>
+        <div class="cart-price">₹${item.price * item.qty}</div>
+      </div>
+    `;
+  });
+  document.querySelector('.summary-row:nth-child(1) span:last-child').textContent = `₹${subtotal}`;
+  document.querySelector('.summary-row.total span:last-child').textContent = `₹${subtotal}`;
+  const placeOrderBtn = document.querySelector('.cart-cta .btn-primary');
+  if (placeOrderBtn) {
+      placeOrderBtn.textContent = `Place order — ₹${subtotal}`;
+      placeOrderBtn.onclick = () => {
+          if (cart.length === 0) {
+              shakeElement(placeOrderBtn);
+              return;
+          }
+          placeOrderBtn.textContent = 'Order Placed! 🌿';
+          placeOrderBtn.style.background = '#3d6b5e';
+          setTimeout(() => {
+              cart = [];
+              renderCart();
+              placeOrderBtn.textContent = 'Place order — ₹0';
+              placeOrderBtn.style.background = '';
+              goTo('s-dashboard');
+          }, 2000);
+      };
+  }
+}
+
+// Animate rings on page load
+setTimeout(() => {
+  document.querySelectorAll('.ring-fill').forEach(r => {
+    const orig = r.getAttribute('stroke-dashoffset');
+    r.setAttribute('stroke-dashoffset', '138.2');
+    setTimeout(() => r.setAttribute('stroke-dashoffset', orig), 50);
+  });
+}, 300);
+
+// ─── Backend Proxy Integration ───────────────────────────────────────────────
+const BACKEND_URL = '/api/analyse';
+
+/** Collect selected symptom names */
+function getSelectedSymptoms() {
+  return [...document.querySelectorAll('.symptom-card.selected')]
+    .map(c => c.querySelector('.symptom-name').textContent.trim());
+}
+
+/** Entry point from Analyse button */
+function analyseSymptoms() {
+  const symptoms = getSelectedSymptoms();
+  if (symptoms.length === 0) {
+    shakeElement(document.getElementById('analyse-btn'));
+    showInlineError('Please select at least one symptom.', 'symptom-cta');
+    return;
+  }
+  clearInlineError('symptom-cta');
+  runAnalysis(symptoms);
+}
+
+async function extractTextFromPDF(dataUrl) {
+  const base64Data = dataUrl.split(',')[1];
+  const pdfData = atob(base64Data);
+  const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+  const pdf = await loadingTask.promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    text += textContent.items.map(item => item.str).join(' ') + '\\n';
+  }
+  return text;
+}
+
+/** Blood report upload → text → /api/blood-report */
+function uploadBloodReport(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  document.getElementById('upload-icon').textContent = '⏳';
+  document.getElementById('upload-title').textContent = file.name;
+  document.getElementById('upload-hint').textContent = 'Reading report…';
+  clearInlineError('upload-box');
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl  = e.target.result;
+    
+    showLoading();
+    document.getElementById('upload-icon').textContent = '📄';
+    document.getElementById('upload-title').textContent = 'Upload blood test report';
+    document.getElementById('upload-hint').textContent = 'PDF or image · AI reads values automatically';
+    input.value = '';
+
+    try {
+      if (file.type !== 'application/pdf') {
+        throw new Error('Please upload a PDF file.');
+      }
+      setTimeout(() => setLoadingStep('ls-2'), 500);
+      const text = await extractTextFromPDF(dataUrl);
+
+      const res = await fetch('/api/blood-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || \`Server returned HTTP \${res.status}\`);
+      }
+
+      setTimeout(() => setLoadingStep('ls-3'), 200);
+      const result = await res.json();
+
+      setTimeout(() => setLoadingStep('ls-4'), 300);
+      setTimeout(() => {
+        populateDashboard(result);
+        populateFoodScreen(result);
+        fetchAwareness(result.deficiencies || []);
+        hideLoading();
+        goTo('s-dashboard');
+      }, 700);
+
+    } catch (err) {
+      hideLoading();
+      showInlineError(\`Blood report analysis failed: \${err.message}\`, 'upload-box');
+    }
+  };
+
+  reader.onerror = () => {
+    document.getElementById('upload-icon').textContent = '❌';
+    document.getElementById('upload-hint').textContent = 'Failed to read file. Try again.';
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function setLoadingStep(stepId) {
+  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
+    document.getElementById(id).classList.remove('active','done');
+  });
+  let reached = false;
+  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
+    if (id === stepId) { document.getElementById(id).classList.add('active'); reached = true; }
+    else if (!reached) document.getElementById(id).classList.add('done');
+  });
+}
+
+function showLoading() {
+  document.getElementById('loading-overlay').classList.add('active');
+  setLoadingStep('ls-1');
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('active');
+  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
+    document.getElementById(id).classList.remove('active','done');
+  });
+}
+
+/** Main API call → Express backend → Groq → clean JSON */
+async function runAnalysis(symptoms) {
+  showLoading();
+
+  try {
+    setTimeout(() => setLoadingStep('ls-2'), 500);
+
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symptoms })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error || \`Server returned HTTP \${res.status}\`);
+    }
+
+    setTimeout(() => setLoadingStep('ls-3'), 200);
+
+    const result = await res.json();
+
+    setTimeout(() => setLoadingStep('ls-4'), 300);
+    setTimeout(() => {
+      populateDashboard(result);
+      populateFoodScreen(result);
+      fetchAwareness(result.deficiencies || []);
+      hideLoading();
+      goTo('s-dashboard');
+    }, 700);
+
+  } catch (err) {
+    hideLoading();
+    showInlineError(\`Analysis failed: \${err.message}\`, 'symptom-cta');
+  }
+}
+
+
+// ─── Dashboard Population ─────────────────────────────────────────────────────
+
+/** Nutrient → ring color mapping fallback */
+const RING_COLORS = {
+  default: ['#d4614a','#c97d2e','#6b5ea8','#4a7c6f','#8fbfb3']
+};
+
+function pctToOffset(pct) {
+  // circumference = 138.2; dashoffset = circ * (1 - pct/100)
+  return (138.2 * (1 - pct / 100)).toFixed(1);
+}
+
+function populateDashboard(result) {
+  const defs = result.deficiencies || [];
+
+  // Body score
+  const scoreNum = document.querySelector('.score-number');
+  scoreNum.innerHTML = `${result.bodyScore}<span>/100</span>`;
+  document.querySelector('.score-subtitle').textContent = result.scoreSubtitle || '';
+
+  // Score badges (with confidence %)
+  const scoreRow = document.querySelector('.score-row');
+  scoreRow.innerHTML = defs.map(d => {
+    const dot = d.severity === 'Critical' ? '🔴' : d.severity === 'Low' ? '🟡' : '🟠';
+    const conf = d.confidence ? `<span class="conf-badge">${d.confidence}%</span>` : '';
+    return `<div class="score-badge">${dot} Low ${d.name}${conf}</div>`;
+  }).join('');
+
+  // Nutrient rings — update first N rings
+  const ringCards = document.querySelectorAll('.ring-card');
+  defs.forEach((d, i) => {
+    if (!ringCards[i]) return;
+    const fill = ringCards[i].querySelector('.ring-fill');
+    const namEl = ringCards[i].querySelector('.ring-name');
+    const pctEl = ringCards[i].querySelector('.ring-pct');
+    const color = d.color || RING_COLORS.default[i];
+    fill.setAttribute('stroke', color);
+    namEl.textContent = d.name.length > 7 ? d.name.slice(0,7) : d.name;
+    pctEl.textContent = `${d.level}%`;
+    // Animate
+    fill.setAttribute('stroke-dasharray', '138.2');
+    fill.setAttribute('stroke-dashoffset', '138.2');
+    setTimeout(() => fill.setAttribute('stroke-dashoffset', pctToOffset(d.level)), 100 + i * 80);
+  });
+
+  // Tip card — update with first deficiency's reason
+  if (defs[0]) {
+    document.querySelector('.tip-body h3').textContent = defs[0].reason;
+    document.querySelector('.tip-body p').textContent =
+      `Top foods: ${(defs[0].foods || []).slice(0,3).map(f => f.name).join(', ')}.`;
+  }
+}
+
+// ─── Food Screen Population ───────────────────────────────────────────────────
+
+const FOOD_NUTRIENT_CLASSES = {
+  'Iron': 'nt-iron',
+  'Vitamin D': 'nt-vitd',
+  'B12': 'nt-b12',
+  'Vitamin B12': 'nt-b12',
+  'Folate': 'nt-folate',
+  'Calcium': 'nt-folate',
+  'default': 'nt-iron'
+};
+
+function getNutrientClass(name) {
+  for (const key of Object.keys(FOOD_NUTRIENT_CLASSES)) {
+    if (name.toLowerCase().includes(key.toLowerCase())) return FOOD_NUTRIENT_CLASSES[key];
+  }
+  return 'nt-iron';
+}
+
+function populateFoodScreen(result) {
+  const defs = result.deficiencies || [];
+  if (!defs.length) return;
+
+  // Update food screen header
+  const defNames = defs.map(d => d.name);
+  document.querySelector('.food-header p').textContent = \`Based on your \${defNames.join(', ')} deficiency\`;
+
+  // Update deficiency banner with primary deficiency
+  const primary = defs[0];
+  document.querySelector('.def-text h4').textContent = \`\${primary.name} deficiency detected\`;
+  document.querySelector('.def-text p').textContent = \`Your level is \${primary.level}% — these foods will help\`;
+
+  // Flatten all foods from all deficiencies
+  allFoodsData = [];
+  defs.forEach(d => {
+    (d.foods || []).forEach(f => allFoodsData.push({ ...f, defName: d.name }));
+  });
+
+  // Update Filter Chips
+  const filterContainer = document.querySelector('.food-filters');
+  if (filterContainer) {
+    filterContainer.innerHTML = \`<div class="filter-chip active" onclick="filterFoods('All')">All foods</div>\` +
+      defNames.map(name => \`<div class="filter-chip" onclick="filterFoods('\${name}')">\${name}</div>\`).join('');
+  }
+
+  renderFoodList('All');
+}
+
+function filterFoods(category) {
+  const chips = document.querySelectorAll('.food-filters .filter-chip');
+  chips.forEach(c => {
+    if (c.textContent === category || (category === 'All' && c.textContent === 'All foods')) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+  renderFoodList(category);
+}
+
+function renderFoodList(category) {
+  const foodList = document.querySelector('.food-list');
+  if (!foodList) return;
+  foodList.innerHTML = '';
+  const filtered = category === 'All' ? allFoodsData : allFoodsData.filter(f => f.defName === category);
+
+  filtered.forEach(food => {
+    const ntClass = getNutrientClass(food.defName);
+    const price = Math.floor(Math.random() * 40)*5 + 20; // Mock price
+    const card = document.createElement('div');
+    card.className = 'food-card';
+    card.onclick = function() { addToCart(this, food.name, price, food.defName, food.emoji); };
+    card.innerHTML = \`
+      <div class="food-emoji">\${food.emoji || '🍱'}</div>
+      <div class="food-info">
+        <h3>\${food.name}</h3>
+        <p>\${food.benefit}</p>
+        <div class="food-nutrients">
+          <span class="nutrient-tag \${ntClass}">\${food.defName} \${food.nutrientAmount || ''}</span>
+        </div>
+      </div>
+      <button class="food-add">+</button>
+    \`;
+    foodList.appendChild(card);
+  });
+}
+
+async function fetchAwareness(defs) {
+  try {
+    const defNames = defs.map(d => d.name);
+    const res = await fetch('/api/awareness', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deficiencies: defNames })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      populateAwareness(data);
+    }
+  } catch (e) {
+    console.error('Failed to fetch awareness cards', e);
+  }
+}
+
+function populateAwareness(data) {
+  const list = document.querySelector('.aware-list');
+  if (!list || !data) return;
+  const tips = Array.isArray(data) ? data : data.tips || [];
+  if (!tips.length) return;
+  list.innerHTML = tips.map(t => {
+    let colorClass = 'green';
+    if (t.category && t.category.toLowerCase().includes('timing')) colorClass = 'amber';
+    if (t.category && t.category.toLowerCase().includes('combo')) colorClass = 'coral';
+
+    return \`
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji \${colorClass}">\${t.emoji || '💡'}</div>
+        <div class="aware-meta">
+          <div class="aware-category" style="color:var(--\${colorClass === 'green' ? 'sage' : colorClass === 'amber' ? 'amber' : 'coral'})">\${t.category || 'Tip'}</div>
+          <h3>\${t.title || 'Awareness Tip'}</h3>
+          <p>\${t.body || t.description || ''}</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span onclick="goTo('s-food')">\${t.actionLabel || 'Try it → View foods'}</span>
+        <span style="color:var(--ink-4);font-size:11px;">1 min read</span>
+      </div>
+    </div>
+  \`;
+  }).join('');
+}
+</script>
+</body>
+</html>
