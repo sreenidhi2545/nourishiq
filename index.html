@@ -36,15 +36,17 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 
 /* PAGES */
 .page {
-  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
-  background: var(--cream);
-  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease;
-  transform: translateX(100%); opacity: 0;
+  position: absolute; top: 0; bottom: 0; width: 100%; overflow-y: auto; overflow-x: hidden;
+  background: var(--cream); padding-bottom: 100px;
+  transition: left .35s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+  left: 100%; opacity: 0;
   scrollbar-width: none;
+  pointer-events: none;
+  visibility: hidden;
 }
 .page::-webkit-scrollbar { display: none; }
-.page.active  { transform: translateX(0);    opacity: 1; }
-.page.prev    { transform: translateX(-30%); opacity: 0; }
+.page.active  { left: 0; opacity: 1; pointer-events: auto; visibility: visible; }
+.page.prev    { left: -30%; opacity: 0; pointer-events: none; visibility: hidden; }
 
 /* STATUS BAR */
 .status {
@@ -58,7 +60,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 
 /* NAV BAR */
 .nav {
-  position: sticky; bottom: 0; background: var(--white);
+  position: fixed; bottom: 0; left: 0; right: 0; background: var(--white);
   display: flex; justify-content: space-around; padding: 10px 0 20px;
   border-top: 1px solid var(--border); z-index: 10;
 }
@@ -137,7 +139,87 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 .pill.amber { background: var(--amber-lt); border-color: var(--amber-md); color: var(--amber); }
 .pill.coral { background: var(--coral-lt); border-color: #e8a89a; color: var(--coral); }
 
-/* ===================== SCREEN 2: SYMPTOM ===================== */
+/* ===================== DAILY PLAN CARD ===================== */
+.daily-plan-card {
+  margin: 0 20px 16px; background: var(--white);
+  border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden;
+  display: none;
+}
+.daily-plan-tag {
+  background: var(--sage-lt); padding: 8px 16px;
+  font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700;
+  color: var(--sage); letter-spacing: 1px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 6px;
+}
+.daily-plan-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.plan-slot {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.plan-slot:nth-child(even) { border-right: none; }
+.plan-slot:nth-child(3), .plan-slot:nth-child(4) { border-bottom: none; }
+.plan-meal {
+  font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700;
+  color: var(--ink-4); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px;
+}
+.plan-foods {
+  font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Syne', sans-serif;
+  margin-bottom: 3px; line-height: 1.3;
+}
+.plan-reason { font-size: 11px; color: var(--sage); line-height: 1.4; }
+
+/* ===================== LAB VALUES ===================== */
+.lab-values-section { padding: 0 20px 16px; }
+.lab-values-scroll {
+  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+}
+.lab-values-scroll::-webkit-scrollbar { display: none; }
+.lab-chip {
+  flex-shrink: 0; background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 10px 14px; min-width: 110px;
+}
+.lab-chip.status-low, .lab-chip.status-deficient, .lab-chip.status-critical {
+  border-color: var(--coral); background: var(--coral-lt);
+}
+.lab-chip.status-high { border-color: var(--amber); background: var(--amber-lt); }
+.lab-chip.status-normal { border-color: var(--sage-md); background: var(--sage-lt); }
+.lab-marker { font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700; color: var(--ink-3); letter-spacing: .3px; }
+.lab-value { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--ink); line-height: 1.1; }
+.lab-unit  { font-size: 10px; color: var(--ink-4); }
+.lab-status-badge {
+  font-size: 9px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; margin-top: 4px;
+}
+.status-low .lab-status-badge, .status-deficient .lab-status-badge, .status-critical .lab-status-badge { color: var(--coral); }
+.status-high .lab-status-badge { color: var(--amber); }
+.status-normal .lab-status-badge { color: var(--sage); }
+
+/* ===================== PRIMARY UPLOAD (on symptom screen) ===================== */
+.upload-primary {
+  margin: 0 20px 0; background: var(--sage);
+  border-radius: var(--r-xl); padding: 28px 24px;
+  text-align: center; cursor: pointer; position: relative; overflow: hidden;
+  transition: opacity .2s;
+}
+.upload-primary:active { opacity: .9; }
+.upload-primary-bg {
+  position: absolute; right: -20px; bottom: -20px;
+  width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.08);
+}
+.upload-primary-icon { font-size: 40px; margin-bottom: 10px; }
+.upload-primary h3 {
+  font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff;
+  margin-bottom: 6px; line-height: 1.3;
+}
+.upload-primary p { font-size: 12px; color: rgba(255,255,255,.8); line-height: 1.5; }
+.upload-primary-hint {
+  display: inline-block; margin-top: 12px;
+  background: rgba(255,255,255,.2); color: #fff;
+  font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700;
+  padding: 6px 16px; border-radius: 100px; letter-spacing: .5px;
+}
 #s-symptom { background: var(--cream); }
 .symptom-header { padding: 16px 24px 20px; }
 .symptom-header h2 {
@@ -273,7 +355,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   color: var(--ink-3); white-space: nowrap; cursor: pointer; transition: all .2s; flex-shrink: 0;
 }
 .filter-chip.active { background: var(--sage); color: #fff; border-color: var(--sage); }
-.food-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+.food-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; }
 .food-card {
   background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border);
   padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
@@ -336,7 +418,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 }
 .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3); padding: 4px 0; }
 .summary-row.total { font-weight: 700; color: var(--ink); font-family: 'Syne', sans-serif; font-size: 15px; border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
-.cart-cta { padding: 8px 20px 8px; }
+.cart-cta { padding: 8px 20px 100px; }
 .delivery-note { text-align: center; font-size: 11px; color: var(--sage); margin-top: 8px; font-family: 'Syne', sans-serif; }
 
 /* ===================== SCREEN 6: AWARENESS ===================== */
@@ -359,7 +441,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 }
 .featured-card h2 { font-family: 'DM Serif Display', serif; font-size: 21px; color: #fff; line-height: 1.3; margin-bottom: 10px; }
 .featured-card p  { font-size: 13px; color: rgba(255,255,255,.8); line-height: 1.6; }
-.aware-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+.aware-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; }
 .aware-card {
   background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 18px; cursor: pointer;
 }
@@ -375,8 +457,37 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 .cat-combo      { color: var(--coral); }
 .aware-meta h3  { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--ink); line-height: 1.3; }
 .aware-meta p   { font-size: 12px; color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
-.aware-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.aware-action span { font-size: 12px; color: var(--sage); font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer; }
+.aware-action {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.aware-action span {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.action-btn {
+  color: var(--sage);
+  background: var(--sage-lt);
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+.action-link {
+  color: var(--ink-3);
+  text-align: center;
+  font-size: 12px !important;
+  text-decoration: underline;
+}
+.aware-card {
+  margin-bottom: 8px;
+}
 
 /* ANIMATIONS */
 @keyframes fadeUp {
@@ -403,43 +514,185 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 .ring-track { fill: none; stroke: var(--border); stroke-width: 5; }
 .ring-fill  { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
 
-/* ===================== LOADING OVERLAY ===================== */
-.loading-overlay {
-  position: absolute; inset: 0; z-index: 100;
-  background: rgba(250,248,243,.92); backdrop-filter: blur(6px);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 18px; opacity: 0; pointer-events: none;
-  transition: opacity .3s ease;
-}
-.loading-overlay.active { opacity: 1; pointer-events: all; }
+/* ===================== INLINE LOADING (button-level only) ===================== */
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-spinner {
-  width: 52px; height: 52px; border-radius: 50%;
-  border: 3px solid var(--border);
-  border-top-color: var(--sage);
-  animation: spin 0.9s linear infinite;
-}
-.loading-label {
-  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
-  color: var(--ink-3); letter-spacing: .3px; text-align: center; padding: 0 32px;
-}
-.loading-steps { display: flex; flex-direction: column; gap: 8px; }
-.loading-step {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 12px; color: var(--ink-4); font-family: 'Syne', sans-serif;
-}
-.loading-step .dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0;
-  transition: background .3s;
-}
-.loading-step.done .dot  { background: var(--sage); }
-.loading-step.active .dot { background: var(--amber); animation: pulse-dot 1s infinite; }
-@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+.btn-loading { opacity: 0.7; cursor: not-allowed; }
 
 /* confidence badge used inside score-badge */
 .conf-badge {
   display: inline-block; font-size: 10px; opacity: .75;
   font-family: 'Syne', sans-serif; margin-left: 4px;
+}
+
+/* LOGIN PAGE */
+/* TOAST */
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px);
+  background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 100px;
+  font-size: 13px; font-weight: 600; z-index: 9999; transition: transform .4s cubic-bezier(.17,.67,.83,.67);
+  box-shadow: 0 10px 25px rgba(0,0,0,.2); text-align: center; width: 85%; max-width: 400px;
+}
+.toast.active { transform: translateX(-50%) translateY(0); }
+
+/* CHAT FAB */
+.chat-fab {
+  position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px;
+  background: var(--sage); color: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+  box-shadow: 0 8px 20px rgba(74,124,111,.3); cursor: pointer; z-index: 100;
+  transition: transform .2s;
+}
+.chat-fab:active { transform: scale(.9); }
+
+/* CHAT PANEL */
+.chat-panel {
+  position: fixed; inset: 0; background: var(--cream); z-index: 200;
+  display: flex; flex-direction: column; transform: translateY(100%);
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+}
+.chat-panel.active { transform: translateY(0); }
+.chat-header {
+  padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border); background: var(--white);
+}
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; }
+.msg.ai { background: var(--white); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg.user { background: var(--sage); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-input-area {
+  padding: 16px 20px; background: var(--white); border-top: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: center;
+}
+.chat-input {
+  flex: 1; background: var(--cream); border: 1px solid var(--border);
+  padding: 12px 16px; border-radius: 100px; font-family: inherit; font-size: 14px; outline: none;
+}
+.chat-send {
+  width: 42px; height: 42px; border-radius: 50%; background: var(--sage);
+  color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--white); width: 100%; max-width: 400px; border-radius: var(--r-xl);
+  padding: 32px 24px; position: relative;
+}
+.modal-close { position: absolute; top: 16px; right: 16px; font-size: 24px; cursor: pointer; color: var(--ink-4); }
+
+/* CHAT FAB PING */
+@keyframes fab-ping {
+  0% { box-shadow: 0 0 0 0 rgba(74,124,111,0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(74,124,111,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,124,111,0); }
+}
+.chat-fab {
+  animation: fab-ping 2s infinite;
+}
+
+/* SUCCESS POP */
+@keyframes success-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+/* PROFILE DROPDOWN */
+.profile-dropdown {
+  position: absolute; top: 75px; right: 24px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 12px; width: 220px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: none; flex-direction: column; gap: 8px; z-index: 50;
+}
+.profile-dropdown.active { display: flex; animation: fadeUp 0.3s ease; }
+.profile-info { padding: 8px 4px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.profile-info h4 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.profile-info p { font-size: 12px; color: var(--ink-4); word-break: break-all; }
+.logout-btn {
+  color: var(--coral); font-weight: 700; font-size: 13px; font-family: 'Syne', sans-serif;
+  padding: 10px; border-radius: 8px; cursor: pointer; text-align: left;
+  transition: background 0.2s;
+}
+.logout-btn:active { background: var(--coral-lt); }
+
+.avatar-circle {
+  width: 100%; height: 100%; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 20px;
+  background: var(--sage); text-transform: uppercase;
+}
+
+.login-container {
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+}
+.login-logo {
+  font-size: 48px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.login-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.login-header p {
+  color: var(--ink-3);
+  font-size: 15px;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.input-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  font-family: 'Syne', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.input-group input {
+  padding: 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+}
+.input-group input:focus {
+  outline: none;
+  border-color: var(--sage);
+}
+.login-footer {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+.login-footer span {
+  color: var(--sage);
+  font-weight: 600;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -448,6 +701,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 <div class="screen">
 
 <!-- ===================== ONBOARDING ===================== -->
+<!-- ===================== SCREEN 1: REGISTRATION ===================== -->
 <div class="page active" id="s-onboard">
   <div class="status">
     <span>9:41</span>
@@ -460,21 +714,63 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
       <div class="ring" style="width:130px;height:130px;"></div>
     </div>
     <div class="logo-mark">🌿</div>
-    <div class="onboard-tagline">Your body knows<br><em>what it needs</em></div>
+    <div class="onboard-tagline">Welcome to NourishIQ<br><em>Let's personalize your health</em></div>
   </div>
   <div class="onboard-body">
-    <h1>Eat smarter.<br>Feel better.</h1>
-    <p>Tell us how you feel or upload your blood report — NourishIQ finds your nutritional gaps and puts the right food at your doorstep.</p>
-    <div class="feature-pills">
-      <div class="pill green">AI deficiency detection</div>
-      <div class="pill amber">Local Indian foods</div>
-      <div class="pill coral">DMart delivery</div>
-      <div class="pill">Blood report reader</div>
-      <div class="pill">Habit streaks</div>
+    <h1>Create Profile</h1>
+    <div style="margin-bottom: 24px;">
+      <div style="margin-bottom: 12px;">
+        <label style="display:block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--ink-2); text-transform: uppercase;">Your Name</label>
+        <input type="text" id="reg-name" placeholder="e.g. Priya" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 14px;">
+      </div>
+      <div>
+        <label style="display:block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--ink-2); text-transform: uppercase;">Email Address</label>
+        <input type="email" id="reg-email" placeholder="priya@example.com" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 14px; margin-bottom: 12px;">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div>
+          <label style="display:block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--ink-2); text-transform: uppercase;">Age</label>
+          <input type="number" id="reg-age" placeholder="28" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 14px;">
+        </div>
+        <div>
+          <label style="display:block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--ink-2); text-transform: uppercase;">Gender</label>
+          <select id="reg-gender" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 14px; background: white;">
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="display:block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--ink-2); text-transform: uppercase;">City</label>
+        <input type="text" id="reg-city" placeholder="e.g. Hyderabad" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 14px;">
+      </div>
     </div>
-    <button class="btn-primary" onclick="goTo('s-symptom')">Get started →</button>
-    <div style="height:12px;"></div>
-    <button class="btn-outline" onclick="goTo('s-dashboard')">Skip to dashboard</button>
+    <button class="btn-primary" onclick="handleRegister()">Complete Registration →</button>
+  </div>
+</div>
+
+<!-- ===================== SCREEN: UPLOAD PROMPT ===================== -->
+<div class="page" id="s-upload-prompt">
+  <div class="onboard-hero" style="height: 380px;">
+    <div class="onboard-rings">
+      <div class="ring" style="width:320px;height:320px;"></div>
+    </div>
+    <div class="logo-mark">🧬</div>
+    <div class="onboard-tagline" style="font-size: 24px;">Personalize your insights</div>
+  </div>
+  <div class="onboard-body" style="text-align: center;">
+    <h1>Personalize your experience</h1>
+    <p>To personalize your experience, please upload your medical report or blood test for AI analysis.</p>
+    
+    <div class="upload-box" onclick="document.getElementById('report-input').click()" style="margin: 0 0 20px;">
+      <div class="upload-icon">📄</div>
+      <h3>Tap to upload report</h3>
+      <p>PDF or Image accepted</p>
+    </div>
+    <input type="file" id="report-input" accept=".pdf,image/*" style="display:none" onchange="uploadBloodReport(this)">
+    
+    <button class="btn-primary" onclick="goTo('s-symptom')" style="background:transparent; color:var(--sage); border:1px solid var(--sage);">I'll do it later (Skip) →</button>
   </div>
 </div>
 
@@ -484,11 +780,31 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
     <span>9:41</span>
     <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
   </div>
-  <div class="symptom-header">
-    <div style="font-size:12px;color:var(--sage);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px;">STEP 1 OF 1</div>
-    <h2>How are you feeling lately?</h2>
-    <p>Select all that apply — our AI will map these to nutritional gaps in your body.</p>
+
+  <!-- PRIMARY: Blood Report Upload -->
+  <div class="symptom-header" style="padding-bottom:12px;">
+    <div style="font-size:12px;color:var(--sage);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px;">ANALYSE YOUR HEALTH</div>
+    <h2>Upload your blood report</h2>
+    <p>AI scans your lab values — haemoglobin, B12, Vitamin D, iron and more — then shows you exactly what to eat.</p>
   </div>
+
+  <div class="upload-primary" id="upload-box" onclick="document.getElementById('blood-file-input').click()">
+    <div class="upload-primary-bg"></div>
+    <div class="upload-primary-icon" id="upload-icon">🧪</div>
+    <h3 id="upload-title">Tap to upload blood report</h3>
+    <p id="upload-hint">PDF or image &middot; AI reads all lab values automatically</p>
+    <div class="upload-primary-hint">SUPPORTS PDF &middot; JPG &middot; PNG</div>
+  </div>
+  <input type="file" id="blood-file-input" accept=".pdf,image/*" style="display:none"
+         onchange="uploadBloodReport(this)">
+
+  <!-- SECONDARY: Symptom Selection -->
+  <div class="or-divider" style="margin-top:20px;">OR SELECT SYMPTOMS</div>
+
+  <div style="padding:0 20px 4px;">
+    <p style="font-size:12px;color:var(--ink-4);font-family:'Syne',sans-serif;">No report? Tell us how you feel instead.</p>
+  </div>
+
   <div class="symptom-grid">
     <div class="symptom-card" onclick="this.classList.toggle('selected')">
       <div class="symptom-icon">😴</div>
@@ -522,24 +838,14 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
     </div>
   </div>
 
-  <div class="or-divider">OR UPLOAD REPORT</div>
-
-  <div class="upload-box" id="upload-box" onclick="document.getElementById('blood-file-input').click()">
-    <div class="upload-icon" id="upload-icon">📄</div>
-    <h3 id="upload-title">Upload blood test report</h3>
-    <p id="upload-hint">PDF or image · AI reads values automatically</p>
-  </div>
-  <input type="file" id="blood-file-input" accept=".pdf,image/*" style="display:none"
-         onchange="uploadBloodReport(this)">
-
   <div class="symptom-cta">
-    <button class="btn-primary" id="analyse-btn" onclick="analyseSymptoms()" style="margin-top:8px;">Analyse my body →</button>
+    <button class="btn-primary" id="analyse-btn" onclick="analyseSymptoms()" style="margin-top:8px;">Analyse symptoms →</button>
   </div>
   <div style="height:16px;"></div>
 </div>
 
 <!-- ===================== DASHBOARD ===================== -->
-<div class="page" id="s-dashboard">
+<div class="page" id="s-dashboard" style="padding-bottom: 100px;">
   <div class="status">
     <span>9:41</span>
     <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
@@ -548,12 +854,34 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
     <div>
       <div style="font-size:12px;color:var(--ink-4);font-family:'Syne',sans-serif;margin-bottom:2px;">Good afternoon,</div>
       <div class="dash-greeting">Priya <span>✦</span></div>
+      <div id="dash-report-type" style="font-size:10px; color:var(--sage); font-family:'Syne',sans-serif; margin-top:2px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; display:none;">Based on your Blood Panel</div>
     </div>
-    <div class="dash-avatar">🌿</div>
+    <div class="dash-avatar" onclick="toggleProfileDropdown()">
+      <div class="avatar-circle" id="user-avatar-char">P</div>
+    </div>
+  </div>
+
+  <!-- PROFILE DROPDOWN -->
+  <div class="profile-dropdown" id="profile-dropdown">
+    <div class="profile-info">
+      <h4 id="drop-name">User Name</h4>
+      <p id="drop-email">user@example.com</p>
+    </div>
+    <div class="logout-btn" onclick="logout()">Logout</div>
+  </div>
+
+  <!-- ANALYSE HEALTH CTA -->
+  <div class="card" style="margin: 0 20px 20px; background: var(--sage); border: none; cursor: pointer; display: flex; align-items: center; gap: 16px; padding: 20px;" onclick="goTo('s-symptom')">
+    <div style="font-size: 32px; background: rgba(255,255,255,0.15); width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center;">🧪</div>
+    <div style="flex: 1;">
+      <h3 style="font-family: 'Syne', sans-serif; font-size: 17px; color: #fff; margin-bottom: 2px;">Analyse your health</h3>
+      <p style="font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.4;">Upload a blood report or check symptoms for AI insights.</p>
+    </div>
+    <div style="color: #fff; font-size: 20px; opacity: 0.8;">→</div>
   </div>
 
   <!-- BODY SCORE -->
-  <div class="score-card">
+  <div class="score-card" style="display:none">
     <div class="score-bg-circle"></div>
     <div class="score-bg-circle2"></div>
     <div class="score-label">BODY SCORE</div>
@@ -653,6 +981,27 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
     </div>
   </div>
 
+  <!-- DAILY FOOD PLAN (populated after blood report analysis) -->
+  <div class="daily-plan-card" id="daily-plan-card">
+    <div class="daily-plan-tag">🍽️ TODAY'S FOOD PLAN — based on your report</div>
+    <div class="daily-plan-grid" id="daily-plan-grid"></div>
+  </div>
+
+  <!-- WARNINGS (populated after report analysis) -->
+  <div class="daily-plan-card" id="warnings-card" style="display:none; margin-top:-10px;">
+    <div class="daily-plan-tag" style="background:var(--coral-lt); color:var(--coral);">🚫 FOODS TO AVOID — for your condition</div>
+    <div id="warnings-list" style="padding:16px; display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+
+  <!-- LAB VALUES (populated after blood report analysis) -->
+  <div class="lab-values-section" id="lab-values-section" style="display:none; padding-bottom: 100px;">
+    <div class="section-header">
+      <div class="section-title">Lab Results</div>
+      <div class="section-link" style="color:var(--ink-4);cursor:default;">from your report</div>
+    </div>
+    <div class="lab-values-scroll" id="lab-values-scroll"></div>
+  </div>
+
   <!-- NAV -->
   <div class="nav">
     <div class="nav-item" onclick="goTo('s-dashboard')">
@@ -671,14 +1020,22 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 </div>
 
 <!-- ===================== FOOD RECOMMENDATIONS ===================== -->
-<div class="page" id="s-food">
+<div class="page" id="s-food" style="padding-bottom: 100px;">
   <div class="status">
     <span>9:41</span>
     <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
   </div>
-  <div class="food-header">
-    <h2>Foods for you</h2>
-    <p>Based on your iron & B12 deficiency</p>
+  <div class="food-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div>
+      <h2>Foods for you</h2>
+      <p>Based on your nutritional needs</p>
+    </div>
+    <div onclick="openMealModal()" style="background: var(--sage-lt); color: var(--sage); padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; font-family: 'Syne', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+      📸 Analyse Meal
+    </div>
+    <!-- Hidden inputs for camera and gallery -->
+    <input type="file" id="meal-input-camera" accept="image/*" capture="environment" style="position:fixed;top:-100px;" onchange="handleMealPhoto(this)">
+    <input type="file" id="meal-input-upload" accept="image/*" style="position:fixed;top:-100px;" onchange="handleMealPhoto(this)">
   </div>
 
   <div class="deficiency-banner">
@@ -768,7 +1125,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 </div>
 
 <!-- ===================== SMART CART ===================== -->
-<div class="page" id="s-cart">
+<div class="page" id="s-cart" style="padding-bottom: 100px;">
   <div class="status">
     <span>9:41</span>
     <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
@@ -787,60 +1144,19 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   </div>
 
   <div class="cart-items" id="cart-items">
-    <div class="cart-item">
-      <div class="cart-item-emoji">🥬</div>
-      <div class="cart-item-info">
-        <h4>Palak (Spinach)</h4>
-        <p>250g bundle · Fresh</p>
-        <div class="cart-item-for">For: Iron deficiency</div>
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-        <span class="qty-num">1</span>
-        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-      </div>
-      <div class="cart-price">₹25</div>
-    </div>
-    <div class="cart-item">
-      <div class="cart-item-emoji">🫘</div>
-      <div class="cart-item-info">
-        <h4>Masoor Dal</h4>
-        <p>500g pack · Tata Sampann</p>
-        <div class="cart-item-for">For: Iron deficiency</div>
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-        <span class="qty-num">1</span>
-        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-      </div>
-      <div class="cart-price">₹60</div>
-    </div>
-    <div class="cart-item">
-      <div class="cart-item-emoji">🥚</div>
-      <div class="cart-item-info">
-        <h4>Eggs (Farm Fresh)</h4>
-        <p>6-pack · Nandini</p>
-        <div class="cart-item-for">For: B12 deficiency</div>
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-        <span class="qty-num">1</span>
-        <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-      </div>
-      <div class="cart-price">₹72</div>
-    </div>
+    <!-- Populated dynamically by renderCart() -->
   </div>
 
   <div class="cart-summary">
-    <div class="summary-row"><span>Subtotal</span><span>₹157</span></div>
+    <div class="summary-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
     <div class="summary-row"><span>Delivery fee</span><span style="color:var(--sage)">Free</span></div>
-    <div class="summary-row"><span>Health score of cart</span><span style="color:var(--sage);font-weight:700;">+22 pts 🌿</span></div>
-    <div class="summary-row total"><span>Total</span><span>₹157</span></div>
+    <div class="summary-row"><span>Health score of cart</span><span style="color:var(--sage);font-weight:700;" id="cart-pts">+0 pts 🌿</span></div>
+    <div class="summary-row total"><span>Total</span><span id="cart-total">₹0</span></div>
   </div>
 
   <div class="cart-cta">
-    <button class="btn-primary" onclick="alert('Order placed! Estimated delivery: 45 minutes. Your body will thank you 🌿')">Place order — ₹157</button>
-    <div class="delivery-note">🌿 This cart addresses 3 of your deficiencies</div>
+    <button class="btn-primary" id="place-order-btn" onclick="placeOrder()">Place order — ₹0</button>
+    <div class="delivery-note" id="cart-deficiency-note">🌿 Add items from the Foods tab</div>
   </div>
   <div style="height:8px;"></div>
 
@@ -853,7 +1169,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 </div>
 
 <!-- ===================== AWARENESS FEED ===================== -->
-<div class="page" id="s-awareness">
+<div class="page" id="s-awareness" style="padding-bottom: 100px;">
   <div class="status">
     <span>9:41</span>
     <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
@@ -871,48 +1187,94 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   </div>
 
   <div class="aware-list">
+    <!-- Static Awareness Cards -->
     <div class="aware-card">
       <div class="aware-card-top">
-        <div class="aware-emoji green">🍋</div>
+        <div class="aware-emoji coral">🩸</div>
         <div class="aware-meta">
-          <div class="aware-category cat-absorption">Absorption tip</div>
-          <h3>Lemon juice triples your iron uptake</h3>
-          <p>Just squeezing lemon on spinach or dal converts iron to a form 3× more absorbable by your body.</p>
+          <div class="aware-category cat-nutrient">Nutrient</div>
+          <h3>Iron Deficiency</h3>
+          <p>Why iron matters for energy: Iron carries oxygen to your cells. Without it, your metabolism slows down and you feel constantly drained and fatigued.</p>
         </div>
       </div>
       <div class="aware-action">
-        <span onclick="goTo('s-food')">Try it → View iron foods</span>
-        <span style="color:var(--ink-4);font-size:11px;">2 min read</span>
+        <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+        <span class="action-link" onclick="window.open('https://en.wikipedia.org/wiki/Iron_deficiency', '_blank')">Read more →</span>
       </div>
     </div>
 
     <div class="aware-card">
       <div class="aware-card-top">
-        <div class="aware-emoji amber">☀️</div>
+        <div class="aware-emoji amber">🧠</div>
         <div class="aware-meta">
-          <div class="aware-category cat-timing">Timing</div>
-          <h3>10 mins of morning sun = your daily Vitamin D</h3>
-          <p>UVB rays before 10 AM trigger skin synthesis of Vitamin D without the UV damage risk of midday sun.</p>
+          <div class="aware-category cat-brainhealth">Brain Health</div>
+          <h3>Vitamin B12</h3>
+          <p>How B12 affects your brain and nerves: B12 maintains the myelin sheath around your nerves. Low levels cause cognitive decline and 'brain fog'.</p>
         </div>
       </div>
       <div class="aware-action">
-        <span>Add to routine</span>
-        <span style="color:var(--ink-4);font-size:11px;">1 min read</span>
+        <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+        <span class="action-link" onclick="window.open('https://en.wikipedia.org/wiki/Vitamin_B12_deficiency', '_blank')">Read more →</span>
       </div>
     </div>
 
     <div class="aware-card">
       <div class="aware-card-top">
-        <div class="aware-emoji coral">🥛</div>
+        <div class="aware-emoji green">☀️</div>
         <div class="aware-meta">
-          <div class="aware-category cat-combo">Food combo</div>
-          <h3>Don't take iron and milk together</h3>
-          <p>Calcium in dairy actively blocks iron absorption. Leave a 2-hour gap between iron-rich foods and dairy.</p>
+          <div class="aware-category cat-immunity">Immunity</div>
+          <h3>Vitamin D</h3>
+          <p>Why most Indians are Vitamin D deficient: Despite the sun, 80% of Indians lack Vitamin D, which is critical for bone health and immune response.</p>
         </div>
       </div>
       <div class="aware-action">
-        <span onclick="goTo('s-food')">See safe combos</span>
-        <span style="color:var(--ink-4);font-size:11px;">2 min read</span>
+        <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+        <span class="action-link" onclick="window.open('https://en.wikipedia.org/wiki/Vitamin_D_deficiency', '_blank')">Read more →</span>
+      </div>
+    </div>
+
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji coral">🥦</div>
+        <div class="aware-meta">
+          <div class="aware-category cat-bloodhealth">Blood Health</div>
+          <h3>Folic Acid</h3>
+          <p>Why folate is critical for blood cell production: Folate is essential for DNA synthesis and the formation of healthy red blood cells in your marrow.</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+        <span class="action-link" onclick="window.open('https://en.wikipedia.org/wiki/Folate_deficiency', '_blank')">Read more →</span>
+      </div>
+    </div>
+
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji green">🦴</div>
+        <div class="aware-meta">
+          <div class="aware-category cat-bones">Bones</div>
+          <h3>Calcium</h3>
+          <p>How calcium affects bones and muscles: Beyond bone density, calcium is a key messenger for muscle contraction and heartbeat regulation.</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+        <span class="action-link" onclick="window.open('https://en.wikipedia.org/wiki/Calcium_in_biology', '_blank')">Read more →</span>
+      </div>
+    </div>
+
+    <div class="aware-card">
+      <div class="aware-card-top">
+        <div class="aware-emoji green">💧</div>
+        <div class="aware-meta">
+          <div class="aware-category cat-hydration">Hydration</div>
+          <h3>Hydration</h3>
+          <p>How water affects nutrient absorption: Water is the primary solvent that transports vitamins and minerals into your bloodstream and cells.</p>
+        </div>
+      </div>
+      <div class="aware-action">
+        <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+        <span class="action-link" onclick="window.open('https://en.wikipedia.org/wiki/Drinking_water', '_blank')">Read more →</span>
       </div>
     </div>
   </div>
@@ -925,25 +1287,328 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   </div>
 </div>
 
-<!-- ===================== LOADING OVERLAY ===================== -->
-<div class="loading-overlay" id="loading-overlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-label">NourishIQ AI is analysing<br>your symptoms…</div>
-  <div class="loading-steps">
-    <div class="loading-step" id="ls-1"><div class="dot"></div> Reading symptoms</div>
-    <div class="loading-step" id="ls-2"><div class="dot"></div> Detecting deficiencies</div>
-    <div class="loading-step" id="ls-3"><div class="dot"></div> Finding Hyderabad foods</div>
-    <div class="loading-step" id="ls-4"><div class="dot"></div> Building your dashboard</div>
+
+
+  <div class="chat-fab" id="chat-fab" onclick="toggleChat()">💬</div>
+
+  <div class="chat-panel" id="chat-panel">
+    <div class="chat-header">
+      <div style="font-family: 'DM Serif Display', serif; font-size: 18px;">NourishIQ Chat</div>
+      <div onclick="toggleChat()" style="font-size: 24px; cursor: pointer; color: var(--ink-4);">×</div>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">👋 Hi! I'm your NourishIQ Assistant. Ask me anything about your nutrition!</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chat-input" class="chat-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button class="chat-send" onclick="sendMessage()">➤</button>
+    </div>
   </div>
-</div>
 
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="generic-modal">
+      <div class="modal-close" onclick="closeModal()">×</div>
+      <div id="modal-content"></div>
+    </div>
+  </div>
 
+  <div class="toast" id="global-toast"></div>
 
 </div><!-- /screen -->
 
 <script>
-// ─── Navigation ───────────────────────────────────────────────────────────────
-let current = 's-onboard';
+// ═══════════════════════════════════════════════════════════════════════════════
+// NourishIQ — Complete Frontend Logic
+// All 8 features: Auth, Analysis, Dashboard, Food, Blood Report, Cart, Awareness
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const LS_ANALYSIS  = 'nourish_last_analysis';
+const LS_STREAK    = 'nourish_streak';
+const LS_CART      = 'nourish_cart';
+const LS_USER      = 'nourish_user';
+const RING_COLORS  = ['#d4614a', '#c97d2e', '#6b5ea8', '#4a7c6f', '#8fbfb3'];
+const NT_CLASSES   = { iron:'nt-iron', 'vitamin d':'nt-vitd', b12:'nt-b12', 'vitamin b12':'nt-b12', folate:'nt-folate', calcium:'nt-folate' };
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let current          = 's-onboard';
+let allFoodsData     = [];
+let cart             = JSON.parse(localStorage.getItem(LS_CART) || '[]');
+let currentUserId    = localStorage.getItem(LS_USER) ? JSON.parse(localStorage.getItem(LS_USER)).id : null;
+let currentSessionId = null;
+let chatHistory      = [];
+let lastDeficiencies = [];
+
+// ─── Daily Limit ──────────────────────────────────────────────────────────────
+function checkDailyLimit() {
+  const today = new Date().toISOString().split('T')[0];
+  const key = `nourishiq_daily_usage_${today}`;
+  let usage = parseInt(localStorage.getItem(key)) || 0;
+  if (usage >= 3) {
+    showToast("You've used your 3 daily analyses. Come back tomorrow for fresh insights! ✨");
+    return false;
+  }
+  localStorage.setItem(key, usage + 1);
+  return true;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('global-toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('active');
+  setTimeout(() => t.classList.remove('active'), 4000);
+}
+
+// ─── Registration ─────────────────────────────────────────────────────────────
+async function handleRegister() {
+  const name   = document.getElementById('reg-name').value.trim();
+  const email  = document.getElementById('reg-email').value.trim();
+  const age    = document.getElementById('reg-age').value.trim();
+  const gender = document.getElementById('reg-gender').value;
+  const city   = document.getElementById('reg-city').value.trim();
+
+  if (!name || !email || !age || !city) { showToast('Please fill all fields'); return; }
+
+  // Proper UUID generation for Supabase
+  currentUserId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+
+  const userObj = { id: currentUserId, name, email, age: parseInt(age), gender, city };
+  localStorage.setItem(LS_USER, JSON.stringify(userObj));
+
+  try {
+    fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userObj)
+    });
+  } catch (e) {}
+
+  updateGreeting(name, email);
+  updateStreak();
+  goTo('s-upload-prompt');
+}
+
+function logout() {
+  localStorage.clear();
+  location.reload(); 
+}
+
+function toggleProfileDropdown() {
+  document.getElementById('profile-dropdown').classList.toggle('active');
+}
+
+function updateGreeting(name, email) {
+  document.querySelectorAll('.dash-greeting').forEach(el => {
+    el.innerHTML = `${name.split(' ')[0]} <span>✦</span>`;
+  });
+  const avatarEl = document.getElementById('user-avatar-char');
+  if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+  
+  const dropName = document.getElementById('drop-name');
+  const dropEmail = document.getElementById('drop-email');
+  if (dropName) dropName.textContent = name;
+  if (dropEmail) dropEmail.textContent = email || 'No email set';
+}
+
+// ─── Streak ───────────────────────────────────────────────────────────────────
+function updateStreak() {
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  let streakData = JSON.parse(localStorage.getItem(LS_STREAK) || '{"count":0, "lastDate":""}');
+
+  if (streakData.lastDate === todayStr) {
+    // Already opened today
+  } else if (streakData.lastDate === yesterdayStr) {
+    // Yesterday was the last visit, increment
+    streakData.count += 1;
+    streakData.lastDate = todayStr;
+  } else {
+    // Gap of more than 1 day or first time
+    streakData.count = 1;
+    streakData.lastDate = todayStr;
+  }
+  
+  localStorage.setItem(LS_STREAK, JSON.stringify(streakData));
+  document.querySelectorAll('.streak-days .num').forEach(el => el.textContent = streakData.count);
+  document.querySelectorAll('.streak-text h3').forEach(el => el.textContent = `${streakData.count}-day streak!`);
+}
+
+// ─── Meal Analysis ───────────────────────────────────────────────────────────
+function openMealModal() {
+  openModal(`
+    <div style="text-align:center;">
+      <h2 class="serif" style="margin-bottom:8px; font-size:24px;">Meal Analysis</h2>
+      <p style="font-size:14px; color:var(--ink-3); margin-bottom:28px;">Instant nutritional insights for your meal.</p>
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+        <!-- Take Photo Option -->
+        <div class="upload-option" onclick="document.getElementById('meal-input-camera').click(); console.log('Camera clicked')">
+          <div class="opt-icon" style="background:var(--sage-lt); color:var(--sage);">📸</div>
+          <div class="opt-label">Take Photo</div>
+        </div>
+        
+        <!-- Upload Option -->
+        <div class="upload-option" onclick="document.getElementById('meal-input-upload').click(); console.log('Upload clicked')">
+          <div class="opt-icon" style="background:var(--cream); color:var(--ink-2);">📁</div>
+          <div class="opt-label">Upload</div>
+        </div>
+      </div>
+      
+      <p style="font-size:11px; color:var(--ink-4); line-height:1.4; margin-bottom:24px;">
+        Our AI identifies nutrients, detects deficiencies, and suggests pairings to maximize absorption.
+      </p>
+      
+      <button class="btn-primary" onclick="closeModal()" style="background:transparent; color:var(--ink-4); border:1px solid var(--border); width:auto; padding:10px 30px;">Cancel</button>
+    </div>
+    
+    <style>
+      .upload-option {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 24px 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .upload-option:hover {
+        border-color: var(--sage);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      }
+      .upload-option:active { transform: scale(0.98); }
+      .opt-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        pointer-events: none;
+      }
+      .opt-label {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--ink);
+        pointer-events: none;
+      }
+    </style>
+  `);
+}
+
+async function handleMealPhoto(input) {
+  console.log('handleMealPhoto triggered', input.files);
+  const file = input.files[0];
+  if (!file) return;
+
+  // Visual feedback in modal
+  const modalContent = document.getElementById('modal-content');
+  modalContent.innerHTML = `
+    <div style="text-align:center; padding:40px 20px;">
+      <div style="font-size:48px; margin-bottom:20px; animation: spin 2s linear infinite;">🥗</div>
+      <h3 class="serif">Analysing your meal...</h3>
+      <p style="font-size:14px; color:var(--ink-3); margin-top:10px;">AI is scanning for nutrients and gaps</p>
+    </div>
+  `;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    try {
+      const res = await fetch('/api/meal-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          image: dataUrl, 
+          deficiencies: lastDeficiencies 
+        })
+      });
+      const data = await res.json();
+      
+      openModal(`
+        <h2 class="serif" style="margin-bottom:12px;">Meal Analysis</h2>
+        <div style="background:var(--sage-lt); padding:16px; border-radius:12px; margin-bottom:16px;">
+          <strong style="font-size:11px; color:var(--sage); text-transform:uppercase;">📊 Nutrients Provided:</strong>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+            ${(data.nutrients || []).map(n => `<span class="pill">${n}</span>`).join('')}
+          </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <strong style="font-size:11px; text-transform:uppercase; color:var(--coral);">⚠️ Missing for your goals:</strong>
+          <p style="font-size:13px; margin-top:4px;">${data.missing || 'None identified.'}</p>
+        </div>
+        <div style="background:var(--cream); padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
+          <strong style="font-size:11px; color:var(--ink-2); text-transform:uppercase;">💡 Recommendation:</strong>
+          <p style="font-size:13px; margin-top:4px;">${data.recommendation}</p>
+        </div>
+        <button class="btn-primary" onclick="closeModal()">Got it!</button>
+      `);
+    } catch (err) {
+      showToast('Meal analysis failed');
+      closeModal();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+function toggleChat() {
+  document.getElementById('chat-panel').classList.toggle('active');
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  appendMsg(msg, 'user');
+  input.value = '';
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory, deficiencies: lastDeficiencies })
+    });
+    const data = await res.json();
+    appendMsg(data.response, 'ai');
+    chatHistory.push({ role: 'user', content: msg }, { role: 'assistant', content: data.response });
+  } catch (e) {
+    appendMsg("I'm having trouble connecting right now. 😔", 'ai');
+  }
+}
+
+function appendMsg(text, sender) {
+  const box = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${sender}`;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
 
 function goTo(id) {
   const prev = document.getElementById(current);
@@ -963,9 +1628,6 @@ function goTo(id) {
 }
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-let cart = [];
-let allFoodsData = [];
 
 function shakeElement(el) {
   if (!el) return;
@@ -1001,19 +1663,29 @@ function clearInlineError(contextId) {
   if (errEl) errEl.textContent = '';
 }
 
+function syncCartToServer() {
+  if (!currentUserId) return;
+  fetch('/api/cart/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: currentUserId, sessionId: currentSessionId, items: cart })
+  }).catch(() => {}); // fire-and-forget, localStorage is the source of truth
+}
+
 function addToCart(el, name, price, forDeficiency, emoji) {
   const btn = el.querySelector('.food-add');
   btn.textContent = '✓';
   btn.style.background = '#3d6b5e';
   setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; }, 1200);
-
   const existing = cart.find(i => i.name === name);
   if (existing) {
     existing.qty += 1;
   } else {
-    let p = typeof price === 'number' ? price : parseInt((price||'').replace('₹','')) || (Math.floor(Math.random()*40)*5+20);
+    const p = typeof price === 'number' ? price : parseInt((price||'').replace('₹','')) || 40;
     cart.push({ name, price: p, qty: 1, forDeficiency: forDeficiency || 'Wellness', emoji: emoji || '🍱' });
   }
+  localStorage.setItem(LS_CART, JSON.stringify(cart));
+  syncCartToServer();
   renderCart();
 }
 
@@ -1023,53 +1695,79 @@ function changeQty(name, delta) {
     item.qty += delta;
     if (item.qty < 1) cart = cart.filter(i => i.name !== name);
   }
+  localStorage.setItem(LS_CART, JSON.stringify(cart));
+  syncCartToServer();
   renderCart();
 }
 
+function placeOrder() {
+  if (cart.length === 0) { shakeElement(document.getElementById('place-order-btn')); return; }
+  const btn = document.getElementById('place-order-btn');
+  const originalText = btn.textContent;
+  
+  btn.classList.add('order-success-active');
+  btn.textContent = 'Order Placed! 🌿';
+  btn.disabled = true;
+
+  // Simulate order persistence
+  setTimeout(() => {
+    cart = [];
+    localStorage.setItem(LS_CART, JSON.stringify(cart));
+    renderCart();
+    
+    showToast('Your superfoods are on the way! 🚚');
+    
+    setTimeout(() => {
+      btn.classList.remove('order-success-active');
+      btn.textContent = originalText;
+      btn.disabled = false;
+      goTo('s-dashboard');
+    }, 2000);
+  }, 800);
+}
+
 function renderCart() {
-  const cartItemsEl = document.getElementById('cart-items');
-  if (!cartItemsEl) return;
-  cartItemsEl.innerHTML = '';
+  const el = document.getElementById('cart-items');
+  if (!el) return;
+  el.innerHTML = '';
   let subtotal = 0;
-  cart.forEach(item => {
-    subtotal += item.price * item.qty;
-    cartItemsEl.innerHTML += `
-      <div class="cart-item">
+  if (cart.length === 0) {
+    el.innerHTML = '<p style="text-align:center;color:var(--ink-4);padding:24px;font-size:13px;">No items yet — tap + on any food 🥗</p>';
+  } else {
+    cart.forEach(item => {
+      subtotal += item.price * item.qty;
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      const safeName = item.name.replace(/'/g, '&#39;');
+      div.innerHTML = `
         <div class="cart-item-emoji">${item.emoji}</div>
         <div class="cart-item-info">
           <h4>${item.name}</h4>
-          <p>Fresh Produce</p>
+          <p>Fresh · D-Mart Hyderabad</p>
           <div class="cart-item-for">For: ${item.forDeficiency}</div>
         </div>
         <div class="qty-ctrl">
-          <button class="qty-btn" onclick="changeQty('${item.name.replace(/'/g,"\\'")}', -1)">−</button>
+          <button class="qty-btn" onclick="changeQty('${safeName}', -1)">−</button>
           <span class="qty-num">${item.qty}</span>
-          <button class="qty-btn" onclick="changeQty('${item.name.replace(/'/g,"\\'")}', 1)">+</button>
+          <button class="qty-btn" onclick="changeQty('${safeName}', 1)">+</button>
         </div>
-        <div class="cart-price">₹${item.price * item.qty}</div>
-      </div>
-    `;
-  });
-  document.querySelector('.summary-row:nth-child(1) span:last-child').textContent = `₹${subtotal}`;
-  document.querySelector('.summary-row.total span:last-child').textContent = `₹${subtotal}`;
-  const placeOrderBtn = document.querySelector('.cart-cta .btn-primary');
-  if (placeOrderBtn) {
-      placeOrderBtn.textContent = `Place order — ₹${subtotal}`;
-      placeOrderBtn.onclick = () => {
-          if (cart.length === 0) {
-              shakeElement(placeOrderBtn);
-              return;
-          }
-          placeOrderBtn.textContent = 'Order Placed! 🌿';
-          placeOrderBtn.style.background = '#3d6b5e';
-          setTimeout(() => {
-              cart = [];
-              renderCart();
-              placeOrderBtn.textContent = 'Place order — ₹0';
-              placeOrderBtn.style.background = '';
-              goTo('s-dashboard');
-          }, 2000);
-      };
+        <div class="cart-price">₹${item.price * item.qty}</div>`;
+      el.appendChild(div);
+    });
+  }
+  const pts = cart.length * 8;
+  const sub  = document.getElementById('cart-subtotal');
+  const tot  = document.getElementById('cart-total');
+  const ptsEl= document.getElementById('cart-pts');
+  const btn  = document.getElementById('place-order-btn');
+  const note = document.getElementById('cart-deficiency-note');
+  if (sub)  sub.textContent  = `₹${subtotal}`;
+  if (tot)  tot.textContent  = `₹${subtotal}`;
+  if (ptsEl) ptsEl.textContent = `+${pts} pts 🌿`;
+  if (btn)  btn.textContent  = `Place order — ₹${subtotal}`;
+  if (note) {
+    const defs = [...new Set(cart.map(i => i.forDeficiency))];
+    note.textContent = cart.length ? `🌿 Addresses: ${defs.join(', ')}` : '🌿 Add items from the Foods tab';
   }
 }
 
@@ -1112,204 +1810,320 @@ async function extractTextFromPDF(dataUrl) {
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
-    text += textContent.items.map(item => item.str).join(' ') + '\\n';
+    text += textContent.items.map(item => item.str).join(' ') + '\n';
   }
   return text;
 }
 
-/** Blood report upload → text → /api/blood-report */
+async function extractBase64ImageFromPDF(dataUrl) {
+  const base64Data = dataUrl.split(',')[1];
+  const pdfData = atob(base64Data);
+  const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+  const pdf = await loadingTask.promise;
+  const page = await pdf.getPage(1);
+  const viewport = page.getViewport({ scale: 2.0 });
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+  await page.render({ canvasContext: context, viewport: viewport }).promise;
+  return canvas.toDataURL('image/jpeg', 0.8);
+}
+
+/** Blood report upload → image → /api/blood-report */
 function uploadBloodReport(input) {
   const file = input.files[0];
   if (!file) return;
 
-  document.getElementById('upload-icon').textContent = '⏳';
-  document.getElementById('upload-title').textContent = file.name;
-  document.getElementById('upload-hint').textContent = 'Reading report…';
+  const iconEl  = document.getElementById('upload-icon');
+  const titleEl = document.getElementById('upload-title');
+  const hintEl  = document.getElementById('upload-hint');
+  const box     = document.getElementById('upload-box');
+
+  if (iconEl)  iconEl.textContent  = '⏳';
+  if (titleEl) titleEl.textContent = file.name.length > 28 ? file.name.slice(0, 25) + '…' : file.name;
+  if (hintEl)  hintEl.textContent  = 'Reading report…';
+  if (box)     box.style.pointerEvents = 'none';
   clearInlineError('upload-box');
 
   const reader = new FileReader();
   reader.onload = async (e) => {
-    const dataUrl  = e.target.result;
-    
-    showLoading();
-    document.getElementById('upload-icon').textContent = '📄';
-    document.getElementById('upload-title').textContent = 'Upload blood test report';
-    document.getElementById('upload-hint').textContent = 'PDF or image · AI reads values automatically';
-    input.value = '';
+    if (!checkDailyLimit()) return;
+    const dataUrl = e.target.result;
+    input.value  = '';
+
+    if (hintEl) hintEl.textContent = 'Sending to AI…';
 
     try {
-      if (file.type !== 'application/pdf') {
-        throw new Error('Please upload a PDF file.');
+      let finalDataUrl = dataUrl;
+      if (file.type === 'application/pdf') {
+        if (hintEl) hintEl.textContent = 'Extracting page from PDF…';
+        finalDataUrl = await extractBase64ImageFromPDF(dataUrl);
+      } else if (!file.type.startsWith('image/')) {
+        throw new Error('Please upload a PDF or an image file.');
       }
-      setTimeout(() => setLoadingStep('ls-2'), 500);
-      const text = await extractTextFromPDF(dataUrl);
+
+      if (hintEl) hintEl.textContent = 'AI is scanning your lab values…';
 
       const res = await fetch('/api/blood-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ image: finalDataUrl, userId: currentUserId })
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || \`Server returned HTTP \${res.status}\`);
+        throw new Error(err?.error || `Server returned HTTP ${res.status}`);
       }
 
-      setTimeout(() => setLoadingStep('ls-3'), 200);
       const result = await res.json();
+      if (result._sessionId) currentSessionId = result._sessionId;
+      localStorage.setItem(LS_ANALYSIS, JSON.stringify(result));
 
-      setTimeout(() => setLoadingStep('ls-4'), 300);
-      setTimeout(() => {
-        populateDashboard(result);
-        populateFoodScreen(result);
-        fetchAwareness(result.deficiencies || []);
-        hideLoading();
-        goTo('s-dashboard');
-      }, 700);
+      populateDashboard(result);
+      populateFoodScreen(result);
+      fetchAwareness(result.deficiencies || []);
+      
+      // Reset UI
+      if (iconEl)  iconEl.textContent  = '🧪';
+      if (titleEl) titleEl.textContent = 'Tap to upload blood report';
+      if (hintEl)  hintEl.textContent  = 'PDF or image · AI reads all lab values automatically';
+      if (box)     box.style.pointerEvents = 'auto';
+      
+      goTo('s-dashboard');
 
     } catch (err) {
-      hideLoading();
-      showInlineError(\`Blood report analysis failed: \${err.message}\`, 'upload-box');
+      if (iconEl)  iconEl.textContent  = '❌';
+      if (titleEl) titleEl.textContent = 'Upload failed';
+      if (hintEl)  hintEl.textContent  = err.message;
+      if (box)     box.style.pointerEvents = 'auto';
+      showInlineError(`Analysis failed: ${err.message}`, 'upload-box');
     }
   };
 
   reader.onerror = () => {
-    document.getElementById('upload-icon').textContent = '❌';
-    document.getElementById('upload-hint').textContent = 'Failed to read file. Try again.';
+    if (iconEl)  iconEl.textContent  = '❌';
+    if (hintEl)  hintEl.textContent  = 'Failed to read file. Try again.';
+    if (box)     box.style.pointerEvents = 'auto';
   };
 
   reader.readAsDataURL(file);
 }
 
-function setLoadingStep(stepId) {
-  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
-    document.getElementById(id).classList.remove('active','done');
-  });
-  let reached = false;
-  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
-    if (id === stepId) { document.getElementById(id).classList.add('active'); reached = true; }
-    else if (!reached) document.getElementById(id).classList.add('done');
-  });
+function showLoading(btnId = 'analyse-btn') {
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'Analysing...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+  }
 }
 
-function showLoading() {
-  document.getElementById('loading-overlay').classList.add('active');
-  setLoadingStep('ls-1');
-}
-
-function hideLoading() {
-  document.getElementById('loading-overlay').classList.remove('active');
-  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
-    document.getElementById(id).classList.remove('active','done');
-  });
+function hideLoading(btnId = 'analyse-btn') {
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.textContent = btn.dataset.originalText || 'Analyse my body →';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
 }
 
 /** Main API call → Express backend → Groq → clean JSON */
 async function runAnalysis(symptoms) {
-  showLoading();
+  if (!checkDailyLimit()) return;
+  showLoading('analyse-btn');
 
   try {
-    setTimeout(() => setLoadingStep('ls-2'), 500);
-
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ symptoms })
+      body: JSON.stringify({ symptoms, userId: currentUserId })
     });
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err?.error || \`Server returned HTTP \${res.status}\`);
+      throw new Error(err?.error || `Server returned HTTP ${res.status}`);
     }
 
-    setTimeout(() => setLoadingStep('ls-3'), 200);
-
     const result = await res.json();
+    if (result._sessionId) currentSessionId = result._sessionId;
+    localStorage.setItem(LS_ANALYSIS, JSON.stringify(result));
+    lastDeficiencies = result.deficiencies?.map(d => d.name) || [];
 
-    setTimeout(() => setLoadingStep('ls-4'), 300);
-    setTimeout(() => {
-      populateDashboard(result);
-      populateFoodScreen(result);
-      fetchAwareness(result.deficiencies || []);
-      hideLoading();
-      goTo('s-dashboard');
-    }, 700);
+    populateDashboard(result);
+    populateFoodScreen(result);
+    fetchAwareness(result.deficiencies || []);
+    hideLoading('analyse-btn');
+    goTo('s-dashboard');
 
   } catch (err) {
-    hideLoading();
-    showInlineError(\`Analysis failed: \${err.message}\`, 'symptom-cta');
+    hideLoading('analyse-btn');
+    showInlineError(`Analysis failed: ${err.message}`, 'symptom-cta');
   }
 }
 
-
 // ─── Dashboard Population ─────────────────────────────────────────────────────
-
-/** Nutrient → ring color mapping fallback */
-const RING_COLORS = {
-  default: ['#d4614a','#c97d2e','#6b5ea8','#4a7c6f','#8fbfb3']
-};
-
 function pctToOffset(pct) {
-  // circumference = 138.2; dashoffset = circ * (1 - pct/100)
-  return (138.2 * (1 - pct / 100)).toFixed(1);
+  const v = Math.max(0, Math.min(100, pct || 0));
+  return (138.2 * (1 - v / 100)).toFixed(1);
 }
 
 function populateDashboard(result) {
   const defs = result.deficiencies || [];
-
-  // Body score
-  const scoreNum = document.querySelector('.score-number');
-  scoreNum.innerHTML = `${result.bodyScore}<span>/100</span>`;
-  document.querySelector('.score-subtitle').textContent = result.scoreSubtitle || '';
-
-  // Score badges (with confidence %)
-  const scoreRow = document.querySelector('.score-row');
-  scoreRow.innerHTML = defs.map(d => {
-    const dot = d.severity === 'Critical' ? '🔴' : d.severity === 'Low' ? '🟡' : '🟠';
-    const conf = d.confidence ? `<span class="conf-badge">${d.confidence}%</span>` : '';
-    return `<div class="score-badge">${dot} Low ${d.name}${conf}</div>`;
-  }).join('');
-
-  // Nutrient rings — update first N rings
-  const ringCards = document.querySelectorAll('.ring-card');
-  defs.forEach((d, i) => {
-    if (!ringCards[i]) return;
-    const fill = ringCards[i].querySelector('.ring-fill');
-    const namEl = ringCards[i].querySelector('.ring-name');
-    const pctEl = ringCards[i].querySelector('.ring-pct');
-    const color = d.color || RING_COLORS.default[i];
-    fill.setAttribute('stroke', color);
-    namEl.textContent = d.name.length > 7 ? d.name.slice(0,7) : d.name;
-    pctEl.textContent = `${d.level}%`;
-    // Animate
-    fill.setAttribute('stroke-dasharray', '138.2');
-    fill.setAttribute('stroke-dashoffset', '138.2');
-    setTimeout(() => fill.setAttribute('stroke-dashoffset', pctToOffset(d.level)), 100 + i * 80);
-  });
-
-  // Tip card — update with first deficiency's reason
-  if (defs[0]) {
-    document.querySelector('.tip-body h3').textContent = defs[0].reason;
-    document.querySelector('.tip-body p').textContent =
-      `Top foods: ${(defs[0].foods || []).slice(0,3).map(f => f.name).join(', ')}.`;
+  
+  // Body score - Show only if clinical data is available
+  const scoreCard = document.querySelector('.score-card');
+  if (result.bodyScore) {
+    if (scoreCard) scoreCard.style.display = 'block';
+    const scoreNum = document.querySelector('.score-number');
+    if (scoreNum) scoreNum.innerHTML = `${result.bodyScore}<span>/100</span>`;
+    const scoreSubtitle = document.querySelector('.score-subtitle');
+    if (scoreSubtitle) scoreSubtitle.textContent = result.scoreSubtitle || '';
+  } else {
+    if (scoreCard) scoreCard.style.display = 'none';
   }
+
+  // Score badges
+  const scoreRow = document.querySelector('.score-row');
+  if (scoreRow) {
+    scoreRow.innerHTML = defs.map(d => {
+      const dot = d.severity === 'Critical' ? '🔴' : d.severity === 'Low' ? '🟡' : '🟠';
+      const conf = d.confidence ? `<span class="conf-badge">${d.confidence}%</span>` : '';
+      return `<div class="score-badge">${dot} Low ${d.name || 'Nutrient'}${conf}</div>`;
+    }).join('');
+  }
+
+  // Nutrient rings — clear and rebuild
+  const ringsRow = document.querySelector('.rings-row');
+  if (ringsRow) {
+    ringsRow.innerHTML = '';
+    defs.forEach((d, i) => {
+      const color = d.color || RING_COLORS[i % RING_COLORS.length];
+      const offset = pctToOffset(d.level || 50);
+      const dName = d.name || 'Nutrient';
+      
+      const card = document.createElement('div');
+      card.className = 'ring-card';
+      card.innerHTML = `
+        <svg class="ring-svg" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="22"/>
+          <circle class="ring-fill" cx="30" cy="30" r="22" stroke="${color}"
+            stroke-dasharray="138.2" stroke-dashoffset="138.2"
+            transform="rotate(-90 30 30)"/>
+        </svg>
+        <div class="ring-name">${dName.length > 7 ? dName.slice(0,7) : dName}</div>
+        <div class="ring-pct">${d.level || 0}%</div>
+      `;
+      ringsRow.appendChild(card);
+      
+      // Animate after append
+      setTimeout(() => {
+        const fill = card.querySelector('.ring-fill');
+        if (fill) fill.setAttribute('stroke-dashoffset', offset);
+      }, 100 + i * 80);
+    });
+  }
+
+  // Tip card
+  const tipH3 = document.querySelector('.tip-body h3');
+  const tipP  = document.querySelector('.tip-body p');
+  if (result.tip && tipH3) {
+    tipH3.textContent = result.tip.title || 'Your nutrition tip';
+    if (tipP) tipP.textContent = result.tip.body || 'Eat balanced meals daily.';
+  } else if (defs[0] && tipH3) {
+    tipH3.textContent = defs[0].reason || 'Your nutrition tip';
+    if (tipP) tipP.textContent = `Top foods: ${(defs[0].foods||[]).slice(0,3).map(f=>f.name).join(', ')}.`;
+  }
+
+  // Report Type Label
+  const reportTypeEl = document.getElementById('dash-report-type');
+  if (reportTypeEl && result.reportType) {
+    reportTypeEl.textContent = `Based on your ${result.reportType}`;
+    reportTypeEl.style.display = 'block';
+  } else if (reportTypeEl) {
+    reportTypeEl.style.display = 'none';
+  }
+
+  // Daily food plan card
+  populateDailyPlan(result.dailyPlan);
+
+  // Warnings card
+  populateWarnings(result.warnings);
+
+  // Lab values (only for blood report results)
+  populateLabValues(result.extractedValues);
+}
+
+function populateWarnings(warnings) {
+  const card = document.getElementById('warnings-card');
+  const list = document.getElementById('warnings-list');
+  if (!card || !list) return;
+
+  if (!Array.isArray(warnings) || warnings.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = warnings.map(w => `
+    <div style="display:flex; gap:10px; align-items:flex-start;">
+      <span style="color:var(--coral); font-weight:bold;">•</span>
+      <div>
+        <div style="font-size:13px; font-weight:700; color:var(--ink);">${w.name}</div>
+        <div style="font-size:11px; color:var(--ink-4); line-height:1.4;">${w.reason}</div>
+      </div>
+    </div>
+  `).join('');
+  card.style.display = 'block';
+}
+
+function populateDailyPlan(plan) {
+  const card = document.getElementById('daily-plan-card');
+  const grid = document.getElementById('daily-plan-grid');
+  if (!card || !grid) return;
+  
+  if (!Array.isArray(plan) || plan.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  grid.innerHTML = plan.slice(0, 4).map(slot => `
+    <div class="plan-slot">
+      <div class="plan-meal">${slot.meal || 'Meal'}</div>
+      <div class="plan-foods">${Array.isArray(slot.foods) ? slot.foods.join(', ') : slot.foods}</div>
+      <div class="plan-reason">${slot.reason || ''}</div>
+    </div>`).join('');
+  card.style.display = 'block';
+}
+
+function populateLabValues(values) {
+  const section = document.getElementById('lab-values-section');
+  const scroll  = document.getElementById('lab-values-scroll');
+  if (!section || !scroll) return;
+
+  if (!Array.isArray(values) || values.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  scroll.innerHTML = values.map(v => {
+    const statusClass = (v.status || 'normal').toLowerCase().replace(/\s/g, '-');
+    return `
+      <div class="lab-chip status-${statusClass}">
+        <div class="lab-marker">${v.marker}</div>
+        <div class="lab-value">${v.value}<span class="lab-unit"> ${v.unit || ''}</span></div>
+        <div style="font-size:10px;color:var(--ink-4);">Ref: ${v.normalRange || '—'}</div>
+        <div class="lab-status-badge">${v.status || ''}</div>
+      </div>`;
+  }).join('');
+  section.style.display = 'block';
 }
 
 // ─── Food Screen Population ───────────────────────────────────────────────────
-
-const FOOD_NUTRIENT_CLASSES = {
-  'Iron': 'nt-iron',
-  'Vitamin D': 'nt-vitd',
-  'B12': 'nt-b12',
-  'Vitamin B12': 'nt-b12',
-  'Folate': 'nt-folate',
-  'Calcium': 'nt-folate',
-  'default': 'nt-iron'
-};
-
 function getNutrientClass(name) {
-  for (const key of Object.keys(FOOD_NUTRIENT_CLASSES)) {
-    if (name.toLowerCase().includes(key.toLowerCase())) return FOOD_NUTRIENT_CLASSES[key];
+  const n = (name || '').toLowerCase();
+  for (const [key, cls] of Object.entries(NT_CLASSES)) {
+    if (n.includes(key)) return cls;
   }
   return 'nt-iron';
 }
@@ -1318,28 +2132,23 @@ function populateFoodScreen(result) {
   const defs = result.deficiencies || [];
   if (!defs.length) return;
 
-  // Update food screen header
   const defNames = defs.map(d => d.name);
-  document.querySelector('.food-header p').textContent = \`Based on your \${defNames.join(', ')} deficiency\`;
+  document.querySelector('.food-header p').textContent = `Based on your ${defNames.join(', ')} deficiency`;
 
-  // Update deficiency banner with primary deficiency
   const primary = defs[0];
-  document.querySelector('.def-text h4').textContent = \`\${primary.name} deficiency detected\`;
-  document.querySelector('.def-text p').textContent = \`Your level is \${primary.level}% — these foods will help\`;
+  document.querySelector('.def-text h4').textContent = `${primary.name} deficiency detected`;
+  document.querySelector('.def-text p').textContent = `Your level is ${primary.level}% — these foods will help`;
 
-  // Flatten all foods from all deficiencies
   allFoodsData = [];
   defs.forEach(d => {
     (d.foods || []).forEach(f => allFoodsData.push({ ...f, defName: d.name }));
   });
 
-  // Update Filter Chips
   const filterContainer = document.querySelector('.food-filters');
   if (filterContainer) {
-    filterContainer.innerHTML = \`<div class="filter-chip active" onclick="filterFoods('All')">All foods</div>\` +
-      defNames.map(name => \`<div class="filter-chip" onclick="filterFoods('\${name}')">\${name}</div>\`).join('');
+    filterContainer.innerHTML = `<div class="filter-chip active" onclick="filterFoods('All')">All foods</div>` +
+      defNames.map(name => `<div class="filter-chip" onclick="filterFoods('${name}')">${name}</div>`).join('');
   }
-
   renderFoodList('All');
 }
 
@@ -1363,70 +2172,102 @@ function renderFoodList(category) {
 
   filtered.forEach(food => {
     const ntClass = getNutrientClass(food.defName);
-    const price = Math.floor(Math.random() * 40)*5 + 20; // Mock price
+    const priceStr = food.price || `₹${Math.floor(Math.random() * 40)*5 + 20}`;
     const card = document.createElement('div');
     card.className = 'food-card';
-    card.onclick = function() { addToCart(this, food.name, price, food.defName, food.emoji); };
-    card.innerHTML = \`
-      <div class="food-emoji">\${food.emoji || '🍱'}</div>
+    card.onclick = function() { addToCart(this, food.name, priceStr, food.defName, food.emoji); };
+    card.innerHTML = `
+      <div class="food-emoji">${food.emoji || '🍱'}</div>
       <div class="food-info">
-        <h3>\${food.name}</h3>
-        <p>\${food.benefit}</p>
+        <h3>${food.name}</h3>
+        <p>${food.benefit || 'Healthy for you'}</p>
         <div class="food-nutrients">
-          <span class="nutrient-tag \${ntClass}">\${food.defName} \${food.nutrientAmount || ''}</span>
+          <span class="nutrient-tag ${ntClass}">${food.defName}</span>
+          <span class="nutrient-tag" style="background:var(--border);color:var(--ink-2)">${priceStr}</span>
         </div>
       </div>
       <button class="food-add">+</button>
-    \`;
+    `;
     foodList.appendChild(card);
   });
 }
 
-async function fetchAwareness(defs) {
+
+async function fetchAwareness(deficiencies) {
+  const container = document.querySelector('.aware-list');
+  if (!container) return;
+  
+  if (!deficiencies || deficiencies.length === 0) return;
+
+  const defNames = Array.isArray(deficiencies) ? deficiencies.map(d => typeof d === 'string' ? d : d.name) : [];
+  if (!defNames.length) return;
+
   try {
-    const defNames = defs.map(d => d.name);
     const res = await fetch('/api/awareness', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deficiencies: defNames })
+      body: JSON.stringify({ deficiencies: defNames, userId: currentUserId, sessionId: currentSessionId })
     });
     if (res.ok) {
-      const data = await res.json();
-      populateAwareness(data);
+      const aiCards = await res.json();
+      const aiHtml = aiCards.map(t => renderAwareCard(t)).join('');
+      // Prepend AI cards to static cards
+      container.insertAdjacentHTML('afterbegin', aiHtml);
     }
-  } catch (e) {
-    console.error('Failed to fetch awareness cards', e);
+  } catch (err) {
+    console.error('Awareness fetch failed', err);
   }
 }
 
-function populateAwareness(data) {
-  const list = document.querySelector('.aware-list');
-  if (!list || !data) return;
-  const tips = Array.isArray(data) ? data : data.tips || [];
-  if (!tips.length) return;
-  list.innerHTML = tips.map(t => {
-    let colorClass = 'green';
-    if (t.category && t.category.toLowerCase().includes('timing')) colorClass = 'amber';
-    if (t.category && t.category.toLowerCase().includes('combo')) colorClass = 'coral';
+function renderAwareCard(t) {
+  let colorClass = 'green';
+  const cat = (t.category || '').toLowerCase();
+  if (cat.includes('timing') || cat.includes('brain')) colorClass = 'amber';
+  if (cat.includes('blood') || cat.includes('nutrient')) colorClass = 'coral';
 
-    return \`
-    <div class="aware-card">
-      <div class="aware-card-top">
-        <div class="aware-emoji \${colorClass}">\${t.emoji || '💡'}</div>
-        <div class="aware-meta">
-          <div class="aware-category" style="color:var(--\${colorClass === 'green' ? 'sage' : colorClass === 'amber' ? 'amber' : 'coral'})">\${t.category || 'Tip'}</div>
-          <h3>\${t.title || 'Awareness Tip'}</h3>
-          <p>\${t.body || t.description || ''}</p>
-        </div>
-      </div>
-      <div class="aware-action">
-        <span onclick="goTo('s-food')">\${t.actionLabel || 'Try it → View foods'}</span>
-        <span style="color:var(--ink-4);font-size:11px;">1 min read</span>
+  return `
+  <div class="aware-card">
+    <div class="aware-card-top">
+      <div class="aware-emoji ${colorClass}">${t.emoji || '💡'}</div>
+      <div class="aware-meta">
+        <div class="aware-category cat-${cat.replace(/\s+/g, '')}">${t.category || 'Tip'}</div>
+        <h3>${t.title || 'Awareness Tip'}</h3>
+        <p>${t.description || t.body || ''}</p>
       </div>
     </div>
-  \`;
-  }).join('');
+    <div class="aware-action">
+      <span class="action-btn" onclick="goTo('s-food')">View recommended foods →</span>
+      ${t.link ? `<span class="action-link" onclick="window.open('${t.link}', '_blank')">Read more →</span>` : ''}
+    </div>
+  </div>
+  `;
 }
+
+// ─── Initialization ──────────────────────────────────────────────────────────
+window.onload = () => {
+  const user = JSON.parse(localStorage.getItem(LS_USER));
+  updateStreak();
+  renderCart();
+  
+  if (user) {
+    currentUserId = user.id;
+    updateGreeting(user.name, user.email);
+    
+    const lastAnalysis = JSON.parse(localStorage.getItem(LS_ANALYSIS));
+    if (lastAnalysis) {
+      lastDeficiencies = lastAnalysis.deficiencies?.map(d => typeof d === 'string' ? d : d.name) || [];
+      populateDashboard(lastAnalysis);
+      populateFoodScreen(lastAnalysis);
+      fetchAwareness(lastAnalysis.deficiencies || []);
+      goTo('s-dashboard');
+    } else {
+      goTo('s-symptom');
+    }
+  } else {
+    // New user → show registration
+    goTo('s-onboard');
+  }
+};
 </script>
 </body>
 </html>
